@@ -9,6 +9,7 @@ import com.jajebr.game.engine.Constants;
 import com.jajebr.game.engine.Director;
 import com.jajebr.game.engine.Screen;
 import com.jajebr.game.game.screen.DebugScreen;
+import com.jajebr.game.game.screen.MainGameScreen;
 
 public class RacingGame extends ApplicationAdapter {
 	private float dtTimer;
@@ -17,7 +18,7 @@ public class RacingGame extends ApplicationAdapter {
 	@Override
 	public void create () {
 		dtTimer = 0.0f;
-		Director.setCurrentScreen(new DebugScreen());
+		Director.setCurrentScreen(new MainGameScreen());
 	}
 
 	@Override
