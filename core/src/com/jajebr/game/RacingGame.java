@@ -51,5 +51,8 @@ public class RacingGame extends ApplicationAdapter {
 	
 	@Override
 	public void dispose () {
+		if (Director.getCurrentScreen() != null) {
+			Director.getCurrentScreen().dispose();
+		}
 	}
 }
