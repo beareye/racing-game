@@ -3,12 +3,11 @@ package com.jajebr.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.jajebr.game.engine.Constants;
 import com.jajebr.game.engine.Director;
-import com.jajebr.game.engine.Screen;
-import com.jajebr.game.game.screen.DebugScreen;
+import com.jajebr.game.engine.screen.Screen;
+import com.jajebr.game.game.Content;
+import com.jajebr.game.game.screen.LoadingScreen;
 import com.jajebr.game.game.screen.MainGameScreen;
 
 public class RacingGame extends ApplicationAdapter {
@@ -18,7 +17,7 @@ public class RacingGame extends ApplicationAdapter {
 	@Override
 	public void create () {
 		dtTimer = 0.0f;
-		Director.setCurrentScreen(new MainGameScreen());
+		Director.setCurrentScreen(new LoadingScreen());
 	}
 
 	@Override
@@ -54,5 +53,6 @@ public class RacingGame extends ApplicationAdapter {
 		if (Director.getCurrentScreen() != null) {
 			Director.getCurrentScreen().dispose();
 		}
+		Content.dispose();
 	}
 }

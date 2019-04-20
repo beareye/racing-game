@@ -34,7 +34,7 @@ public class World {
 
     public World() {
         gravity = 9.8f;
-        dragCoefficient = 1f;
+        dragCoefficient = 0.24f;
         track = new Track("test track");
     }
 }

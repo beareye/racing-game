@@ -1,12 +1,13 @@
 package com.jajebr.game.engine;
 
 import com.badlogic.gdx.Gdx;
+import com.jajebr.game.engine.screen.Screen;
 
 /**
  * A director contains globals for the game, such as the screen.
  */
 public class Director {
-    public static boolean DEBUG = false;
+    public static boolean DEBUG = true;
 
     private static Screen currentScreen;
 

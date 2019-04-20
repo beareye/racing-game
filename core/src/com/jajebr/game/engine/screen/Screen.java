@@ -1,4 +1,4 @@
-package com.jajebr.game.engine;
+package com.jajebr.game.engine.screen;
 
 /**
  * A screen represents some part of the game.

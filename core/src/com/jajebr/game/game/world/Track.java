@@ -1,5 +1,7 @@
 package com.jajebr.game.game.world;
 
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+
 /**
  * Track for the game.
  */
@@ -20,5 +22,10 @@ public class Track {
      */
     public Track(String newName) {
         this.name = newName;
+        
+    }
+
+    public void draw(ModelBatch modelBatch) {
+
     }
 }

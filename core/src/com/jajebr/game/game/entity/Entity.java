@@ -2,11 +2,20 @@ package com.jajebr.game.game.entity;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.jajebr.game.engine.Constants;
+import com.jajebr.game.engine.Director;
+import com.jajebr.game.game.Content;
 import com.jajebr.game.game.physics.Force;
 import com.jajebr.game.game.world.World;
 
@@ -128,8 +137,6 @@ public abstract class Entity {
         displacement.add(accel.scl(dt / 2));
 
         position.add(displacement);
-
-        // i hope this works
     }
 
     /**
@@ -141,7 +148,7 @@ public abstract class Entity {
         // Apply the weight force.
         this.addForce(new Force("Weight", new Vector3(0, this.mass * -world.getGravity() , 0)));
         // TODO: possibly make drag proportional to area covered?
-        Vector3 velocitySquared = velocity.cpy().scl(velocity);
+        Vector3 velocitySquared = velocity.cpy();
         velocitySquared.scl(-0.5f * world.getDragCoefficient() * 5f);
         this.addForce(new Force("Drag", velocitySquared));
     }
@@ -161,5 +168,72 @@ public abstract class Entity {
      */
     public void render(ModelBatch modelBatch) {
 
+    }
+
+    /**
+     * Draws a free body of the entity.
+     * Assumes the shapeRenderer has already began in Filled mode.
+     * @param shapeRenderer
+     * @param spriteBatch
+     */
+    public void drawFreeBody(Camera cam, ShapeRenderer shapeRenderer, SpriteBatch spriteBatch) {
+        ShapeRenderer.ShapeType existingShapeType = shapeRenderer.getCurrentType();
+
+        float largestMagnitude = 1f;
+        float largestLength = 50f;
+        for (Force force : forces) {
+            largestMagnitude = Math.max(largestMagnitude, force.len2());
+        }
+        float scale = largestLength / largestMagnitude;
+        Vector3 end = new Vector3();
+
+        shapeRenderer.setColor(Color.RED);
+        // Origin for full-body
+        shapeRenderer.box(
+                this.position.x - 0.5f,
+                this.position.y - 0.5f,
+                this.position.z - 0.5f,
+                1f,
+                1f,
+                1f
+        );
+
+        shapeRenderer.end();
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        for (Force force : forces) {
+            end.set(force).nor().scl(force.len2() * scale).add(this.position);
+            shapeRenderer.setColor(Color.ORANGE);
+            shapeRenderer.line(
+                    this.position.x,
+                    this.position.y,
+                    this.position.z,
+                    end.x,
+                    end.y,
+                    end.z
+            );
+        }
+
+        shapeRenderer.end();
+
+        spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        spriteBatch.begin();
+            Vector3 screenSpace = new Vector3();
+            GlyphLayout glyphLayout = new GlyphLayout();
+            for (Force force : forces) {
+                glyphLayout.setText(Content.debugFont, force.getName());
+                end.set(force).nor().scl(force.len2() * scale).add(this.position);
+                screenSpace.set(end);
+                screenSpace = cam.project(screenSpace);
+                Content.debugFont.draw(
+                        spriteBatch,
+                        force.getName(),
+                        screenSpace.x - glyphLayout.width / 2f,
+                        screenSpace.y - glyphLayout.height / 2f
+                );
+            }
+        spriteBatch.end();
+
+        shapeRenderer.setProjectionMatrix(cam.combined);
+        shapeRenderer.begin(existingShapeType);
     }
 }
