@@ -23,6 +23,14 @@ public abstract class EntityRenderable extends Entity {
     private BoundingBox boundingBox;
 
     /**
+     * Returns the bounding box of the model.
+     * @return the bounding box of the model
+     */
+    public BoundingBox getBoundingBox() {
+        return boundingBox;
+    }
+
+    /**
      * Initializes an EntityRenderable.
      * @param model the model to create an instance with
      */
@@ -30,8 +38,8 @@ public abstract class EntityRenderable extends Entity {
         super(world);
         instance = new ModelInstance(model);
 
-        BoundingBox box = new BoundingBox();
-        instance.calculateBoundingBox(box);
+        boundingBox = new BoundingBox();
+        boundingBox = instance.calculateBoundingBox(boundingBox);
     }
 
     @Override
@@ -48,6 +56,19 @@ public abstract class EntityRenderable extends Entity {
                 getRotation().z,
                 getRotation().w
         );
+
+        this.boundingBox.set(
+                new Vector3(
+                        this.getPosition().x - this.boundingBox.getWidth() / 2f,
+                        this.getPosition().y - this.boundingBox.getHeight() / 2f,
+                        this.getPosition().z - this.boundingBox.getDepth() / 2f
+                ),
+                new Vector3(
+                        this.getPosition().x + this.boundingBox.getWidth() / 2f,
+                        this.getPosition().y + this.boundingBox.getHeight() / 2f,
+                        this.getPosition().z + this.boundingBox.getDepth() / 2f
+                )
+        );
     }
 
     @Override
@@ -56,15 +77,13 @@ public abstract class EntityRenderable extends Entity {
     }
 
     public void renderDebug(ShapeRenderer shapeRenderer) {
-        /*
         shapeRenderer.box(
                 this.boundingBox.min.x,
                 this.boundingBox.min.y,
-                this.boundingBox.min.z,
+                this.boundingBox.max.z,
                 this.boundingBox.getWidth(),
                 this.boundingBox.getHeight(),
                 this.boundingBox.getDepth()
         );
-        */
     }
 }

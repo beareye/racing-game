@@ -51,6 +51,8 @@ public class MainGameScreen extends Screen {
 
         entities = new Array<Entity>();
         car = new EntityCar(world, Content.formulaStar);
+        car.getPosition().set(10f, 10f, 10f);
+        car.pullCameraToCar(cam);
         entities.add(car);
     }
 
@@ -58,9 +60,13 @@ public class MainGameScreen extends Screen {
     public void update(float dt) {
         for (Entity entity : entities) {
             entity.updateInWorld(dt);
-            // TODO: change so that we apply motion after checking for collisions
             entity.applyMotion(dt);
+        }
 
+        world.getTrack().testCarCollision(car);
+
+        for (Entity entity : entities) {
+            entity.finalizeMotion();
         }
 
         // TODO: remove
@@ -84,7 +90,7 @@ public class MainGameScreen extends Screen {
         shapeRenderer.end();
 
         modelBatch.begin(cam);
-        modelBatch.setCamera(cam);
+            world.getTrack().draw(modelBatch);
             for (Entity entity : entities) {
                 entity.render(modelBatch);
             }
@@ -93,7 +99,6 @@ public class MainGameScreen extends Screen {
         shapeRenderer.setProjectionMatrix(cam.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(Color.GOLD);
-            car.renderDebug(shapeRenderer);
             car.drawFreeBody(cam, shapeRenderer, spriteBatch);
         shapeRenderer.end();
     }

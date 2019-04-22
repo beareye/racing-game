@@ -2,6 +2,7 @@ package com.jajebr.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.jajebr.game.engine.Constants;
 import com.jajebr.game.engine.Director;
@@ -26,6 +27,8 @@ public class RacingGame extends ApplicationAdapter {
 		// Clear color and depth buffer (3D)
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
+		this.checkKeys();
+
 		if (Director.getCurrentScreen() != null) {
 			Screen screen = Director.getCurrentScreen();
 			// Game loop
@@ -38,6 +41,16 @@ public class RacingGame extends ApplicationAdapter {
 			// Interpolation factor
 			float alpha = dtTimer / Constants.SPF;
 			screen.draw(alpha);
+		}
+	}
+
+	/**
+	 * Checks keys for any top-level operations (e.g. fullscreen)
+	 */
+	public void checkKeys() {
+		if (Gdx.input.isKeyJustPressed(Input.Keys.F11)) {
+			Director.swapFullscreen();
+			this.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		}
 	}
 

@@ -30,6 +30,8 @@ public abstract class Entity {
 
     private Vector3 velocity;
     private Vector3 position;
+    private Vector3 displacement;
+    private Vector3 nextAttemptedPosition;
     private Quaternion rotation;
 
     /**
@@ -54,6 +56,22 @@ public abstract class Entity {
      */
     public Vector3 getPosition() {
         return position;
+    }
+
+    /**
+     * Returns the next attempted position of the entity.
+     * @return the next attempted position
+     */
+    public Vector3 getNextAttemptedPosition() {
+        return nextAttemptedPosition;
+    }
+
+    /**
+     * Returns the displacement from the current position to the next attempted position.
+     * @return the next attempted displacement
+     */
+    public Vector3 getDisplacement() {
+        return displacement;
     }
 
     /**
@@ -90,6 +108,8 @@ public abstract class Entity {
         mass = 1f;
         velocity = new Vector3();
         position = new Vector3();
+        nextAttemptedPosition = new Vector3();
+        displacement = new Vector3();
         rotation = new Quaternion();
         world = newWorld;
     }
@@ -131,12 +151,20 @@ public abstract class Entity {
         averageVelocity.scl(0.5f);
 
         // Integrate for displacement
-        Vector3 displacement = new Vector3();
+        displacement.setZero();
         displacement.add(averageVelocity.scl(dt));
         // Accel is already scaled by dt, we need to scale it again
         displacement.add(accel.scl(dt / 2));
 
-        position.add(displacement);
+        // Don't add the displacement to the position yet; calculate the next attempted position for collisions.
+        nextAttemptedPosition.set(displacement).add(position);
+    }
+
+    /**
+     * Finalizes the motion that was calculated by applyMotion.
+     */
+    public void finalizeMotion() {
+        this.position.set(this.nextAttemptedPosition);
     }
 
     /**
@@ -192,7 +220,7 @@ public abstract class Entity {
         shapeRenderer.box(
                 this.position.x - 0.5f,
                 this.position.y - 0.5f,
-                this.position.z - 0.5f,
+                this.position.z + 0.5f,
                 1f,
                 1f,
                 1f

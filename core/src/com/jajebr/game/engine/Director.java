@@ -9,6 +9,8 @@ import com.jajebr.game.engine.screen.Screen;
 public class Director {
     public static boolean DEBUG = true;
 
+    private static boolean fullscreen = false;
+
     private static Screen currentScreen;
 
     public static Screen getCurrentScreen() {
@@ -21,5 +23,14 @@ public class Director {
 
     public static void log(String message) {
         Gdx.app.log(Constants.APP_ID, message);
+    }
+
+    public static void swapFullscreen() {
+        if (fullscreen) {
+            Gdx.graphics.setWindowedMode(Gdx.graphics.getDisplayMode().width, Gdx.graphics.getDisplayMode().height);
+        } else {
+            Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+        }
+        fullscreen = !fullscreen;
     }
 }
