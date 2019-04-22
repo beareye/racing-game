@@ -2,6 +2,7 @@ package com.jajebr.game.game.entity;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -43,8 +44,8 @@ public abstract class EntityRenderable extends Entity {
     }
 
     @Override
-    public void applyMotion(float dt) {
-        super.applyMotion(dt);
+    public void finalizeMotion() {
+        super.finalizeMotion();
 
         // TODO: implement scale (if needed)
         this.instance.transform.set(
@@ -72,8 +73,8 @@ public abstract class EntityRenderable extends Entity {
     }
 
     @Override
-    public void render(ModelBatch modelBatch) {
-        modelBatch.render(this.instance);
+    public void render(ModelBatch modelBatch, Environment environment) {
+        modelBatch.render(this.instance, environment);
     }
 
     public void renderDebug(ShapeRenderer shapeRenderer) {

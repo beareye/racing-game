@@ -1,5 +1,6 @@
 package com.jajebr.game.game.world.track;
 
+import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.jajebr.game.game.entity.EntityCar;
 import com.jajebr.game.game.world.World;
@@ -12,6 +13,7 @@ public class Track {
     private TrackMeshCreator trackMeshCreator;
     private TrackCollider trackCollider;
     private World world;
+    private float restitutionCoefficient;
 
     /**
      * Returns the name of the track.
@@ -30,6 +32,19 @@ public class Track {
     }
 
     /**
+     * Returns the restitution coefficient of the track.
+     * Any collisions (not on the y-axis) are bounced back, multiplied by this coefficient.
+     * @return the restitution coefficient
+     */
+    public float getRestitutionCoefficient() {
+        return restitutionCoefficient;
+    }
+
+    public TrackCollider getTrackCollider() {
+        return trackCollider;
+    }
+
+    /**
      * Initializes an empty track.
      * @param newName the name of the track
      */
@@ -38,10 +53,11 @@ public class Track {
         this.trackMeshCreator = new TrackMeshCreator();
         this.trackCollider = new TrackCollider(this, trackMeshCreator);
         this.world = newWorld;
+        this.restitutionCoefficient = 0.2f;
     }
 
-    public void draw(ModelBatch modelBatch) {
-        modelBatch.render(this.trackMeshCreator);
+    public void draw(ModelBatch modelBatch, Environment environment) {
+        modelBatch.render(this.trackMeshCreator, environment);
     }
 
     public boolean testCarCollision(EntityCar car) {

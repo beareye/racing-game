@@ -1,9 +1,11 @@
 package com.jajebr.game.engine.renderer;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.math.collision.Sphere;
 
 /**
@@ -44,6 +46,46 @@ public class SpecialShapeRenderer extends ShapeRenderer {
             renderer.color(colorBits);
             renderer.vertex(point3.x, point3.y, point3.z);
         }
+    }
+
+    /**
+     * Draws a ray.
+     * @param ray the ray
+     */
+    public void ray(Ray ray, float length) {
+        this.point3D(ray.origin.x, ray.origin.y, ray.origin.z);
+        Vector3 end = ray.direction.cpy().scl(length).add(ray.origin);
+        this.setColor(Color.CYAN);
+
+        ShapeType curShapeType = getCurrentType();
+
+        this.end();
+        this.begin(ShapeType.Line);
+        this.line(
+                ray.origin,
+                end
+        );
+        this.end();
+        this.begin(curShapeType);
+    }
+
+    public void ray(Ray ray) {
+        this.ray(ray, 20f);
+    }
+
+    /**
+     * Draws a point.
+     * @param x
+     * @param y
+     * @param z
+     */
+    public void point3D(float x, float y, float z, float width) {
+        float halfWidth = width / 2;
+        this.box(x - halfWidth, y - halfWidth, z + halfWidth, width, width, width);
+    }
+
+    public void point3D(float x, float y, float z) {
+        this.point3D(x, y, z, 2);
     }
 
     /**

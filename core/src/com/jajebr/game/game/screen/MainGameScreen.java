@@ -4,15 +4,19 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.loaders.ModelLoader;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.math.collision.Sphere;
 import com.badlogic.gdx.utils.Array;
 import com.jajebr.game.engine.Director;
@@ -40,7 +44,7 @@ public class MainGameScreen extends Screen {
         cam.position.set(20, 20, 20);
         cam.lookAt(0, 0, 0);
         cam.near = 0.1f;
-        cam.far = 1000f;
+        cam.far = 10000f;
         cam.update();
 
         modelBatch = new ModelBatch();
@@ -53,6 +57,8 @@ public class MainGameScreen extends Screen {
         car = new EntityCar(world, Content.formulaStar);
         car.getPosition().set(10f, 10f, 10f);
         car.pullCameraToCar(cam);
+        world.getEnvironment().add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -1.0f, -0.8f, 0.2f));
+        world.getEnvironment().add(new PointLight().set(0.4f, 0.8f, 0.4f, 100f, 100f, 100f, 100f));
         entities.add(car);
     }
 
@@ -70,7 +76,7 @@ public class MainGameScreen extends Screen {
         }
 
         // TODO: remove
-        if (Gdx.input.isKeyPressed(Input.Keys.O)) {
+        if (!Gdx.input.isKeyPressed(Input.Keys.O)) {
             car.pullCameraToCar(cam);
         }
     }
@@ -90,9 +96,9 @@ public class MainGameScreen extends Screen {
         shapeRenderer.end();
 
         modelBatch.begin(cam);
-            world.getTrack().draw(modelBatch);
+            world.getTrack().draw(modelBatch, world.getEnvironment());
             for (Entity entity : entities) {
-                entity.render(modelBatch);
+                entity.render(modelBatch, world.getEnvironment());
             }
         modelBatch.end();
 
@@ -100,6 +106,8 @@ public class MainGameScreen extends Screen {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(Color.GOLD);
             car.drawFreeBody(cam, shapeRenderer, spriteBatch);
+
+            world.getTrack().getTrackCollider().testCarCollisionDebug(car, shapeRenderer);
         shapeRenderer.end();
     }
 

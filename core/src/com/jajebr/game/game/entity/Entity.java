@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
@@ -157,7 +158,7 @@ public abstract class Entity {
         displacement.add(accel.scl(dt / 2));
 
         // Don't add the displacement to the position yet; calculate the next attempted position for collisions.
-        nextAttemptedPosition.set(displacement).add(position);
+        nextAttemptedPosition.set(position).add(displacement);
     }
 
     /**
@@ -194,7 +195,7 @@ public abstract class Entity {
      *
      * @param modelBatch the model batch to render with
      */
-    public void render(ModelBatch modelBatch) {
+    public void render(ModelBatch modelBatch, Environment environment) {
 
     }
 

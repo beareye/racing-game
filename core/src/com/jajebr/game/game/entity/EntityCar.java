@@ -22,7 +22,7 @@ public class EntityCar extends EntityRenderable {
     private float MAX_CAMERA_SPEED_SQUARED = 300000f;
 
     private float THRUST_FORCE = 500f;
-    private float REVERSE_FORCE = 50f;
+    private float REVERSE_FORCE = -350f;
     private float BRAKE_FORCE = 25f;
 
     /**
