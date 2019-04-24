@@ -16,7 +16,6 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
-import com.badlogic.gdx.physics.bullet.collision.SWIGTYPE_p_f_p_q_const__btCollisionShape_p_q_const__btCollisionShape__bool;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
@@ -25,7 +24,6 @@ import com.badlogic.gdx.utils.Array;
 import com.jajebr.game.engine.Constants;
 import com.jajebr.game.engine.Director;
 import com.jajebr.game.game.Content;
-import com.jajebr.game.game.physics.Force;
 import com.jajebr.game.game.world.World;
 
 /**
@@ -43,6 +41,9 @@ public abstract class Entity {
     private btRigidBody.btRigidBodyConstructionInfo constructionInfo;
     private btRigidBody rigidBody;
     private Vector3 localInertia;
+
+    private Vector3 position;
+    private Quaternion rotationQuaternion;
 
     /**
      * Returns the mass of the object.
@@ -68,14 +69,44 @@ public abstract class Entity {
         return rigidBody;
     }
 
+    /**
+     * Returns the position of the entity.
+     * Modifying this vector will <b>not</b> modify the position of the entity.
+     * @return the position of the entity
+     */
+    public Vector3 getPosition() {
+        return position;
+    }
+
+    /**
+     * Returns the rotation of the entity.
+     * Modifying this quaternion will <b>not</b> modify the position of the entity.
+     * @return the rotation of the entity
+     */
+    public Quaternion getRotationQuaternion() {
+        return rotationQuaternion;
+    }
+
+    /**
+     * Returns the world of the entity.
+     * @return the world of the entity
+     */
+    public World getWorld() {
+        return world;
+    }
+
     public Entity(World newWorld, Model model, float newMass) {
+        this.world = newWorld;
         this.modelInstance = new ModelInstance(model);
         this.entityMotionState = new EntityMotionState(this);
-        this.world = newWorld;
+        this.mass = newMass;
+        this.position = new Vector3();
+        this.rotationQuaternion = new Quaternion();
+
+        rotationQuaternion = new Quaternion();
 
         createShape();
 
-        this.mass = newMass;
         this.localInertia = new Vector3();
         if (this.mass > 0f) {
             this.shape.calculateLocalInertia(this.mass, this.localInertia);
@@ -119,7 +150,8 @@ public abstract class Entity {
      * @param dt the delta-time
      */
     public void update(float dt) {
-
+        this.modelInstance.transform.getRotation(rotationQuaternion);
+        this.modelInstance.transform.getTranslation(position);
     }
 
     /**
@@ -129,6 +161,20 @@ public abstract class Entity {
      */
     public void render(ModelBatch modelBatch, Environment environment) {
         modelBatch.render(this.modelInstance, environment);
+    }
+
+    /**
+     * Pulls the camera behind the entity.
+     * @param cam the camera
+     */
+    public void pullCameraBehind(Camera cam) {
+        rotationQuaternion = this.getModelInstance().transform.getRotation(rotationQuaternion);
+
+        Vector3 newZ = new Vector3(0, 0, -1);
+        rotationQuaternion.transform(newZ);
+
+        cam.position.set(newZ).scl(100f).add(this.position);
+        cam.direction.set(newZ).scl(-1f);
     }
 
     /**

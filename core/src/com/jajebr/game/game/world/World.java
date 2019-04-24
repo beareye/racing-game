@@ -1,5 +1,7 @@
 package com.jajebr.game.game.world;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Environment;
@@ -17,6 +19,7 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btDbvtBroadphase;
 import com.badlogic.gdx.physics.bullet.collision.btDefaultCollisionConfiguration;
+import com.badlogic.gdx.physics.bullet.collision.btHeightfieldTerrainShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver;
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
@@ -141,6 +144,9 @@ public class World {
      * @param modelBatch the model batch
      */
     public void render(ModelBatch modelBatch) {
+        if (Gdx.input.isKeyPressed(Input.Keys.O) && entities.size > 0) {
+            entities.get(0).pullCameraBehind(modelBatch.getCamera());
+        }
         for (Entity entity : entities) {
             entity.getRigidBody().getWorldTransform(entity.getModelInstance().transform);
             entity.render(modelBatch, this.environment);
