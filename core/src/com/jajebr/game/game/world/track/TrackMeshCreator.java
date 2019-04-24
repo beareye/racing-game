@@ -11,6 +11,8 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.bullet.Bullet;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Pool;
@@ -26,6 +28,8 @@ public class TrackMeshCreator implements RenderableProvider {
     private ShortArray indicesArray;
     private float[] vertices;
     private short[] indices;
+
+    private btCollisionShape bulletShape;
 
     private Mesh trackMesh;
     private Material material;
@@ -234,6 +238,12 @@ public class TrackMeshCreator implements RenderableProvider {
     public void compileVerticesAndIndices() {
         vertices = vertexArray.toArray();
         indices = indicesArray.toArray();
+
+
+    }
+
+    public void dispose() {
+
     }
 
     @Override

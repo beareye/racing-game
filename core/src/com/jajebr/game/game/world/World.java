@@ -1,7 +1,28 @@
 package com.jajebr.game.game.world;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionConfiguration;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionDispatcher;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
+import com.badlogic.gdx.physics.bullet.collision.btDbvtBroadphase;
+import com.badlogic.gdx.physics.bullet.collision.btDefaultCollisionConfiguration;
+import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver;
+import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
+import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
+import com.badlogic.gdx.utils.Array;
+import com.jajebr.game.engine.Constants;
+import com.jajebr.game.game.entity.Entity;
 import com.jajebr.game.game.world.track.Track;
 
 /**
@@ -10,9 +31,18 @@ import com.jajebr.game.game.world.track.Track;
 public class World {
     private float gravity;
     private float dragCoefficient;
-    private float restitutionCoefficient;
     private Environment environment;
-    private com.jajebr.game.game.world.track.Track track;
+    private Track track;
+
+    private Array<Entity> entities;
+
+    private WorldContactListener worldContactListener;
+
+    private btCollisionConfiguration collisionConfiguration;
+    private btCollisionDispatcher collisionDispatcher;
+    private btDbvtBroadphase broadphase;
+    private btConstraintSolver constraintSolver;
+    private btDiscreteDynamicsWorld dynamicsWorld;
 
     /**
      * Returns the gravity of the world.
@@ -48,11 +78,88 @@ public class World {
 
     public World() {
         gravity = 9.8f;
-        dragCoefficient = 0.24f;
+        dragCoefficient = 0.5f;
         track = new Track(this, "test track");
+
+        entities = new Array<Entity>();
+
+        // Basic lights
         environment = new Environment();
         environment.set(ColorAttribute.createAmbient(0.7f, 0.7f, 0.7f, 1.0f));
         environment.set(ColorAttribute.createDiffuse(0.6f, 0.6f, 0.6f, 1.0f));
         environment.set(ColorAttribute.createSpecular(0.8f, 0.8f, 0.8f, 1.0f));
+
+        collisionConfiguration = new btDefaultCollisionConfiguration();
+        collisionDispatcher = new btCollisionDispatcher(collisionConfiguration);
+        broadphase = new btDbvtBroadphase();
+        constraintSolver = new btSequentialImpulseConstraintSolver();
+        dynamicsWorld = new btDiscreteDynamicsWorld(collisionDispatcher, broadphase, constraintSolver, collisionConfiguration);
+        dynamicsWorld.setGravity(new Vector3(0, -this.getGravity(), 0f));
+
+        worldContactListener = new WorldContactListener(this);
+    }
+
+    /**
+     * Adds an entity into the world.
+     * @param entity the entity to add
+     */
+    public void addEntity(Entity entity) {
+        entities.add(entity);
+        dynamicsWorld.addRigidBody(entity.getRigidBody());
+    }
+
+    /**
+     * Returns an index of the entity in the entity array.
+     */
+    public int getEntityIndex() {
+        return entities.size;
+    }
+
+    /**
+     * Returns the entity with the index.
+     * @param index the index of the entity
+     * @return the entity with the index
+     */
+    public Entity getEntityWithIndex(int index) {
+        return entities.get(index);
+    }
+
+    /**
+     * Updates all entities in the world.
+     * @param dt the delta-time
+     */
+    public void update(float dt) {
+        for (Entity entity : entities) {
+            entity.update(dt);
+        }
+
+        dynamicsWorld.stepSimulation(dt, Constants.PHYSICS_MAX_SUBSTEP, Constants.PHYSICS_TIMESTEP);
+    }
+
+    /**
+     * Renders the world and all of its entities.
+     * @param modelBatch the model batch
+     */
+    public void render(ModelBatch modelBatch) {
+        for (Entity entity : entities) {
+            entity.getRigidBody().getWorldTransform(entity.getModelInstance().transform);
+            entity.render(modelBatch, this.environment);
+        }
+    }
+
+    /**
+     * Disposes all entities and the world itself.
+     */
+    public void dispose() {
+        for (Entity entity : entities) {
+            entity.dispose();
+        }
+
+        dynamicsWorld.dispose();
+        constraintSolver.dispose();
+        broadphase.dispose();
+        collisionDispatcher.dispose();
+        collisionConfiguration.dispose();
+        worldContactListener.dispose();
     }
 }

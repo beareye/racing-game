@@ -11,7 +11,6 @@ import com.jajebr.game.game.world.World;
 public class Track {
     private String name;
     private TrackMeshCreator trackMeshCreator;
-    private TrackCollider trackCollider;
     private World world;
     private float restitutionCoefficient;
 
@@ -40,10 +39,6 @@ public class Track {
         return restitutionCoefficient;
     }
 
-    public TrackCollider getTrackCollider() {
-        return trackCollider;
-    }
-
     /**
      * Initializes an empty track.
      * @param newName the name of the track
@@ -51,16 +46,11 @@ public class Track {
     public Track(World newWorld, String newName) {
         this.name = newName;
         this.trackMeshCreator = new TrackMeshCreator();
-        this.trackCollider = new TrackCollider(this, trackMeshCreator);
         this.world = newWorld;
         this.restitutionCoefficient = 0.2f;
     }
 
     public void draw(ModelBatch modelBatch, Environment environment) {
         modelBatch.render(this.trackMeshCreator, environment);
-    }
-
-    public boolean testCarCollision(EntityCar car) {
-        return trackCollider.testCarCollision(car);
     }
 }

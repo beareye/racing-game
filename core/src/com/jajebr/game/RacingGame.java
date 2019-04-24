@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.physics.bullet.Bullet;
 import com.jajebr.game.engine.Constants;
 import com.jajebr.game.engine.Director;
 import com.jajebr.game.engine.screen.Screen;
@@ -17,6 +18,8 @@ public class RacingGame extends ApplicationAdapter {
 	// Don't use constructor when initiating, use create for ApplicationAdapter classes
 	@Override
 	public void create () {
+		Bullet.init();
+
 		dtTimer = 0.0f;
 		Director.setCurrentScreen(new LoadingScreen());
 	}
