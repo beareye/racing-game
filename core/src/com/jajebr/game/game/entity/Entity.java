@@ -44,6 +44,7 @@ public abstract class Entity {
 
     private Vector3 position;
     private Quaternion rotationQuaternion;
+    private Vector3 front;
 
     /**
      * Returns the mass of the object.
@@ -95,6 +96,22 @@ public abstract class Entity {
         return world;
     }
 
+    /**
+     * Returns the entity motion state.
+     * @return the motion state of the enetity
+     */
+    public EntityMotionState getEntityMotionState() {
+        return this.entityMotionState;
+    }
+
+    /**
+     * Returns a vector that points out of the entity.
+     * @return the front vector that points out of the entity's direction
+     */
+    public Vector3 getFront() {
+        return front;
+    }
+
     public Entity(World newWorld, Model model, float newMass) {
         this.world = newWorld;
         this.modelInstance = new ModelInstance(model);
@@ -102,6 +119,7 @@ public abstract class Entity {
         this.mass = newMass;
         this.position = new Vector3();
         this.rotationQuaternion = new Quaternion();
+        this.front = new Vector3();
 
         rotationQuaternion = new Quaternion();
 
@@ -123,6 +141,11 @@ public abstract class Entity {
         this.rigidBody.setCollisionFlags(
                 this.rigidBody.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK
         );
+
+        // TODO: change if we want to test interactions in the ground
+        this.rigidBody.setContactCallbackFlag(Constants.ENTITY_BITFLAG);
+        this.rigidBody.setContactCallbackFilter(Constants.ENTITY_BITFLAG);
+
         this.rigidBody.setUserValue(this.world.getEntityIndex());
 
         world.addEntity(this);
@@ -139,6 +162,7 @@ public abstract class Entity {
 
         Vector3 dimensions = new Vector3();
         box.getDimensions(dimensions);
+
         // Defining a box in Bullet => half of the dimensions must be specified
         dimensions.scl(0.5f);
         // Create an AABB about the model
@@ -152,6 +176,9 @@ public abstract class Entity {
     public void update(float dt) {
         this.modelInstance.transform.getRotation(rotationQuaternion);
         this.modelInstance.transform.getTranslation(position);
+
+        this.front.set(Vector3.Z);
+        this.rotationQuaternion.transform(this.front);
     }
 
     /**
@@ -164,17 +191,21 @@ public abstract class Entity {
     }
 
     /**
+     * Applies a force to the center of the rigid body.
+     * @param force the force
+     */
+    public void applyForce(Vector3 force) {
+        this.getRigidBody().applyCentralForce(force);
+    }
+
+    /**
      * Pulls the camera behind the entity.
      * @param cam the camera
      */
     public void pullCameraBehind(Camera cam) {
-        rotationQuaternion = this.getModelInstance().transform.getRotation(rotationQuaternion);
-
-        Vector3 newZ = new Vector3(0, 0, -1);
-        rotationQuaternion.transform(newZ);
-
-        cam.position.set(newZ).scl(100f).add(this.position);
-        cam.direction.set(newZ).scl(-1f);
+        cam.position.set(Vector3.Z).scl(-200f).add(this.getPosition());
+        cam.direction.set(Vector3.Z);
+        cam.up.set(Vector3.Y);
     }
 
     /**

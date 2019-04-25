@@ -2,7 +2,6 @@ package com.jajebr.game.game.world.track;
 
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.jajebr.game.game.entity.EntityCar;
 import com.jajebr.game.game.world.World;
 
 /**
@@ -10,7 +9,7 @@ import com.jajebr.game.game.world.World;
  */
 public class Track {
     private String name;
-    private TrackMeshCreator trackMeshCreator;
+    private TrackMesh trackMesh;
     private World world;
     private float restitutionCoefficient;
 
@@ -39,18 +38,26 @@ public class Track {
         return restitutionCoefficient;
     }
 
+    public TrackMesh getTrackMesh() {
+        return trackMesh;
+    }
+
     /**
      * Initializes an empty track.
      * @param newName the name of the track
      */
     public Track(World newWorld, String newName) {
         this.name = newName;
-        this.trackMeshCreator = new TrackMeshCreator();
+        this.trackMesh = new TrackMesh();
         this.world = newWorld;
         this.restitutionCoefficient = 0.2f;
     }
 
     public void draw(ModelBatch modelBatch, Environment environment) {
-        modelBatch.render(this.trackMeshCreator, environment);
+        modelBatch.render(this.trackMesh, environment);
+    }
+
+    public void dispose() {
+        trackMesh.dispose();
     }
 }

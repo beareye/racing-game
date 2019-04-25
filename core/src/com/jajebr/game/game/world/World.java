@@ -2,27 +2,20 @@ package com.jajebr.game.game.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
+import com.badlogic.gdx.physics.bullet.DebugDrawer;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionConfiguration;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionDispatcher;
-import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
-import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btDbvtBroadphase;
 import com.badlogic.gdx.physics.bullet.collision.btDefaultCollisionConfiguration;
-import com.badlogic.gdx.physics.bullet.collision.btHeightfieldTerrainShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver;
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
+import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
+import com.badlogic.gdx.physics.bullet.linearmath.btIDebugDraw;
 import com.badlogic.gdx.utils.Array;
 import com.jajebr.game.engine.Constants;
 import com.jajebr.game.game.entity.Entity;
@@ -46,6 +39,8 @@ public class World {
     private btDbvtBroadphase broadphase;
     private btConstraintSolver constraintSolver;
     private btDiscreteDynamicsWorld dynamicsWorld;
+
+    private DebugDrawer debugDrawer;
 
     /**
      * Returns the gravity of the world.
@@ -79,6 +74,14 @@ public class World {
         return environment;
     }
 
+    /**
+     * Returns the world used by Bullet.
+     * @return the Bullet world
+     */
+    public btDiscreteDynamicsWorld getDynamicsWorld() {
+        return dynamicsWorld;
+    }
+
     public World() {
         gravity = 9.8f;
         dragCoefficient = 0.5f;
@@ -99,7 +102,13 @@ public class World {
         dynamicsWorld = new btDiscreteDynamicsWorld(collisionDispatcher, broadphase, constraintSolver, collisionConfiguration);
         dynamicsWorld.setGravity(new Vector3(0, -this.getGravity(), 0f));
 
+        debugDrawer = new DebugDrawer();
+        debugDrawer.setDebugMode(btIDebugDraw.DebugDrawModes.DBG_MAX_DEBUG_DRAW_MODE);
+        dynamicsWorld.setDebugDrawer(debugDrawer);
+
         worldContactListener = new WorldContactListener(this);
+
+        addTrackBody();
     }
 
     /**
@@ -109,6 +118,14 @@ public class World {
     public void addEntity(Entity entity) {
         entities.add(entity);
         dynamicsWorld.addRigidBody(entity.getRigidBody());
+    }
+
+    public void addTrackBody() {
+        dynamicsWorld.addRigidBody(
+                track.getTrackMesh().getTrackHeightmap().getRigidBody(),
+                Constants.TRACK_BITFLAG,
+                Constants.ALL_BITFLAG
+        );
     }
 
     /**
@@ -151,6 +168,10 @@ public class World {
             entity.getRigidBody().getWorldTransform(entity.getModelInstance().transform);
             entity.render(modelBatch, this.environment);
         }
+
+        debugDrawer.begin(modelBatch.getCamera());
+            dynamicsWorld.debugDrawWorld();
+        debugDrawer.end();
     }
 
     /**
@@ -167,5 +188,7 @@ public class World {
         collisionDispatcher.dispose();
         collisionConfiguration.dispose();
         worldContactListener.dispose();
+
+        track.dispose();
     }
 }

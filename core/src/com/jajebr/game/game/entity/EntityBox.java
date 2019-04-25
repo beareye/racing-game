@@ -6,8 +6,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.jajebr.game.game.Content;
 import com.jajebr.game.game.world.World;
 
-public class EntityGround extends Entity {
-    public EntityGround(World newWorld) {
+public class EntityBox extends Entity {
+    public EntityBox(World newWorld) {
         super(newWorld, Content.boxModel, 0f);
         this.getRigidBody().translate(new Vector3(10f, -20f, 0f));
     }

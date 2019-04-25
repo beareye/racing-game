@@ -14,8 +14,12 @@ public class WorldContactListener extends ContactListener {
     }
 
     @Override
-    public boolean onContactAdded(btManifoldPoint cp, btCollisionObjectWrapper colObj0Wrap, int partId0, int index0, btCollisionObjectWrapper colObj1Wrap, int partId1, int index1) {
-        Director.log("Collision between " + colObj0Wrap.getCollisionObject().getUserValue() + " and " + colObj1Wrap.getCollisionObject().getUserValue() + "?");
-        return true;
+    public void onContactEnded(int userValue0, boolean match0, int userValue1, boolean match1) {
+        if (match0) {
+            Director.log("Possibly match0 for " + userValue0);
+        }
+        if (match1) {
+            Director.log("Possibly match1 for " + userValue1);
+        }
     }
 }

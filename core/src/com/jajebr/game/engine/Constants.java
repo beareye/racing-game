@@ -9,5 +9,8 @@ public class Constants {
     public static final float PHYSICS_TIMESTEP = 1.0f / 60;
     public static final int PHYSICS_MAX_SUBSTEP = 5;
     public static final String APP_ID = "RacingGame";
-    public static final float EPSILON = 1.000001f;
+
+    public static final short TRACK_BITFLAG = 1 << 8;
+    public static final short ENTITY_BITFLAG = 1 << 9;
+    public static final short ALL_BITFLAG = -1;
 }
