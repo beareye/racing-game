@@ -45,7 +45,7 @@ public class MainGameScreen extends Screen {
         world.getEnvironment().add(new PointLight().set(0.4f, 0.8f, 0.4f, 100f, 100f, 100f, 100f));
 
         cameraInputController = new CameraInputController(cam);
-        cameraInputController.translateUnits = 50f;
+        cameraInputController.translateUnits = 100f;
         Gdx.input.setInputProcessor(cameraInputController);
     }
 

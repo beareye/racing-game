@@ -24,6 +24,8 @@ public class TrackHeightmap {
     private int width;
     private int height;
     private Vector3 scaling;
+    private float minHeight;
+    private float maxHeight;
 
     private btHeightfieldTerrainShape terrainShape;
     private btMotionState motionState;
@@ -49,9 +51,23 @@ public class TrackHeightmap {
         return heightmap;
     }
 
+    public btHeightfieldTerrainShape getTerrainShape() {
+        return terrainShape;
+    }
+
+    public float getMinHeight() {
+        return minHeight;
+    }
+
+    public float getMaxHeight() {
+        return maxHeight;
+    }
+
     public TrackHeightmap() {
         width = 32;
         height = 32;
+        minHeight = 0f;
+        maxHeight = 1f;
         scaling = new Vector3(50f, 50f, 50f);
 
         createHeightmap();
@@ -62,7 +78,7 @@ public class TrackHeightmap {
         heightmap = new float[width * height];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                heightmap[x + y * width] = MathUtils.sin(x) / 8 + 0.5f;
+                heightmap[x + y * width] = MathUtils.sin(x) / 2 + 0.5f;
             }
         }
         floatBuffer = BufferUtils.newFloatBuffer(heightmap.length);
@@ -70,13 +86,10 @@ public class TrackHeightmap {
     }
 
     public void createShape() {
-        terrainShape = new btHeightfieldTerrainShape(width, height, floatBuffer, 1f, 0f, 1f, 1, false);
+        terrainShape = new btHeightfieldTerrainShape(width, height, floatBuffer, 1f, this.minHeight, this.maxHeight, 1, false);
         terrainShape.setLocalScaling(scaling);
         motionState = new btDefaultMotionState();
         rigidBody = new btRigidBody(0f, motionState, terrainShape);
-
-        // TODO: remove
-        rigidBody.translate(new Vector3(0f, -150f, 0f));
 
         rigidBody.setUserValue(TrackHeightmap.GROUND_USERVALUE);
     }

@@ -46,6 +46,8 @@ public abstract class Entity {
     private Quaternion rotationQuaternion;
     private Vector3 front;
 
+    private Vector3 maxAngularVelocity;
+
     /**
      * Returns the mass of the object.
      * @return the mass of the object
@@ -120,6 +122,8 @@ public abstract class Entity {
         this.position = new Vector3();
         this.rotationQuaternion = new Quaternion();
         this.front = new Vector3();
+
+        this.maxAngularVelocity = new Vector3(5f, 5f, 5f);
 
         rotationQuaternion = new Quaternion();
 
@@ -204,6 +208,7 @@ public abstract class Entity {
      */
     public void pullCameraBehind(Camera cam) {
         cam.position.set(Vector3.Z).scl(-200f).add(this.getPosition());
+        cam.position.add(0f, cam.viewportHeight / 8f, 0f);
         cam.direction.set(Vector3.Z);
         cam.up.set(Vector3.Y);
     }

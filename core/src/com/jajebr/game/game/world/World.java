@@ -164,13 +164,14 @@ public class World {
         if (Gdx.input.isKeyPressed(Input.Keys.O) && entities.size > 0) {
             entities.get(0).pullCameraBehind(modelBatch.getCamera());
         }
+        track.draw(modelBatch, this.environment);
         for (Entity entity : entities) {
             entity.getRigidBody().getWorldTransform(entity.getModelInstance().transform);
             entity.render(modelBatch, this.environment);
         }
 
         debugDrawer.begin(modelBatch.getCamera());
-            dynamicsWorld.debugDrawWorld();
+            //dynamicsWorld.debugDrawWorld();
         debugDrawer.end();
     }
 
