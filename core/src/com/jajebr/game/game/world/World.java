@@ -18,6 +18,7 @@ import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSol
 import com.badlogic.gdx.physics.bullet.linearmath.btIDebugDraw;
 import com.badlogic.gdx.utils.Array;
 import com.jajebr.game.engine.Constants;
+import com.jajebr.game.engine.Director;
 import com.jajebr.game.game.entity.Entity;
 import com.jajebr.game.game.world.track.Track;
 
@@ -161,7 +162,7 @@ public class World {
      * @param modelBatch the model batch
      */
     public void render(ModelBatch modelBatch) {
-        if (Gdx.input.isKeyPressed(Input.Keys.O) && entities.size > 0) {
+        if (!Gdx.input.isKeyPressed(Input.Keys.O) && entities.size > 0) {
             entities.get(0).pullCameraBehind(modelBatch.getCamera());
         }
         track.draw(modelBatch, this.environment);
@@ -170,9 +171,11 @@ public class World {
             entity.render(modelBatch, this.environment);
         }
 
-        debugDrawer.begin(modelBatch.getCamera());
-            //dynamicsWorld.debugDrawWorld();
-        debugDrawer.end();
+        if (Director.DEBUG) {
+            debugDrawer.begin(modelBatch.getCamera());
+                dynamicsWorld.debugDrawWorld();
+            debugDrawer.end();
+        }
     }
 
     /**

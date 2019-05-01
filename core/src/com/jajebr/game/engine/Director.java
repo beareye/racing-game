@@ -7,7 +7,7 @@ import com.jajebr.game.engine.screen.Screen;
  * A director contains globals for the game, such as the screen.
  */
 public class Director {
-    public static boolean DEBUG = true;
+    public static boolean DEBUG = false;
 
     private static boolean fullscreen = false;
 

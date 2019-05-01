@@ -21,11 +21,14 @@ public class TrackHeightmap {
 
     private FloatBuffer floatBuffer;
     private float[] heightmap;
+    private boolean[] valid;
     private int width;
     private int height;
     private Vector3 scaling;
     private float minHeight;
     private float maxHeight;
+
+    private TrackCreator trackCreator;
 
     private btHeightfieldTerrainShape terrainShape;
     private btMotionState motionState;
@@ -51,6 +54,10 @@ public class TrackHeightmap {
         return heightmap;
     }
 
+    public boolean[] getValidSpace() {
+        return valid;
+    }
+
     public btHeightfieldTerrainShape getTerrainShape() {
         return terrainShape;
     }
@@ -64,11 +71,12 @@ public class TrackHeightmap {
     }
 
     public TrackHeightmap() {
-        width = 32;
-        height = 32;
+        width = 64;
+        height = 64;
         minHeight = 0f;
         maxHeight = 1f;
-        scaling = new Vector3(50f, 50f, 50f);
+        scaling = new Vector3(50f, 500f, 50f);
+        trackCreator = new TrackCreator(this);
 
         createHeightmap();
         createShape();
@@ -76,11 +84,10 @@ public class TrackHeightmap {
 
     public void createHeightmap() {
         heightmap = new float[width * height];
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                heightmap[x + y * width] = MathUtils.sin(x) / 2 + 0.5f;
-            }
-        }
+        valid = new boolean[width * height];
+
+        this.trackCreator.create();
+
         floatBuffer = BufferUtils.newFloatBuffer(heightmap.length);
         floatBuffer.put(heightmap);
     }
@@ -92,6 +99,31 @@ public class TrackHeightmap {
         rigidBody = new btRigidBody(0f, motionState, terrainShape);
 
         rigidBody.setUserValue(TrackHeightmap.GROUND_USERVALUE);
+    }
+
+    /**
+     * Sets a place in the heightmap to a height, and then marks it as valid.
+     */
+    public void setValidHeight(int x, int y, float height) {
+        if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+            return;
+        }
+        this.heightmap[x + y * this.width] = height;
+        this.valid[x + y * this.width] = true;
+    }
+
+    /**
+     * Sets a piece in the heightmap to a height, and then marks it invalid.
+     * @param x the x-coordintae
+     * @param y the y-coordinate
+     * @param height the height
+     */
+    public void setInvalidHeight(int x, int y, float height) {
+        if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+            return;
+        }
+        this.heightmap[x + y * this.width] = height;
+        this.valid[x + y * this.width] = true;
     }
 
     public void dispose() {

@@ -23,6 +23,7 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.utils.Array;
 import com.jajebr.game.engine.Constants;
 import com.jajebr.game.engine.Director;
+import com.jajebr.game.engine.Utilities;
 import com.jajebr.game.game.Content;
 import com.jajebr.game.game.world.World;
 
@@ -204,12 +205,21 @@ public abstract class Entity {
 
     /**
      * Pulls the camera behind the entity.
+     * TODO: move to a different class
      * @param cam the camera
      */
     public void pullCameraBehind(Camera cam) {
-        cam.position.set(Vector3.Z).scl(-200f).add(this.getPosition());
+        Vector3 relativeZ = new Vector3(this.front);
+        relativeZ.y = 0f;
+        relativeZ.nor();
+
+        float pullback = 150f;
+        float t = this.getRigidBody().getLinearVelocity().len2() / 8000;
+        t = MathUtils.clamp(t, 0, 1);
+        pullback += Utilities.quadraticEasing(0f, 100f, t);
+        cam.position.set(relativeZ).scl(-pullback).add(this.getPosition());
         cam.position.add(0f, cam.viewportHeight / 8f, 0f);
-        cam.direction.set(Vector3.Z);
+        cam.direction.set(relativeZ);
         cam.up.set(Vector3.Y);
     }
 

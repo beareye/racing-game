@@ -55,6 +55,9 @@ public class RacingGame extends ApplicationAdapter {
 			Director.swapFullscreen();
 			this.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		}
+		if (Gdx.input.isKeyJustPressed(Input.Keys.F12)) {
+			Director.DEBUG = !Director.DEBUG;
+		}
 	}
 
 	@Override
