@@ -1,13 +1,35 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-<style>  
+<style> 
     div.padded {  
       padding-top: 0px;  
       padding-right: 100px;  
       padding-bottom: 0.25in;  
       padding-left: 100px;  
-    }  
+    }
+
+		body {
+			margin: 1em;
+		}
+
+		p {
+			text-indent: 2em;
+		}
+
+		.flexContainer {
+			display: flex;
+			justify-content: center;
+			text-align: center;
+			width: 100%;
+		}
+
+		.video {
+			margin: 0 auto;
+			height: 720px;
+			max-width: 100%;
+			width: 100%;
+		}
   </style> 
 <title>Deliverable 1</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -21,18 +43,75 @@
 	<h2 align="middle">Jason Hu - 3031829724</h2>
 	<br />
 	
-	<p>Problem: We are trying to solve multiple gaming problems. These include applying realistic acceleration and decceleration, calculating turning centripetal forces and turning radius, and collision detection with complex shapes. We will apply the laws of motion and kinematic physics to solve these problems. We will probably use estimations of these laws as to conserve computing power.</p>
-    <p>Progress so far: In line with our tentative timeline, we have learned the basics of LibGDX and have imported starter code for our game. Additionally, we have also 
-        created many classes to deal with the physics that our world is subject to, from basic forces like gravity and acceleration to more advanced concepts like collision detection.
-        We have also begun to create the track with heightmaps that will be turned into meshes that we will hopefully map textures onto to create a fully formed track. We have yet to create many
-        models for the environment and the cars themselves, but this will come in the following week. 
-    </p>
+	<h3>
+		Problem
+	</h3>
+	<p>We are trying to solve multiple gaming problems. These include applying realistic acceleration and decceleration, calculating turning centripetal forces and turning radius, and collision detection with complex shapes. We will apply the laws of motion and kinematic physics to solve these problems. We will probably use estimations of these laws as to conserve computing power.</p>
 
-    <p>Preliminary Results & tentative timeline: So far, we have created a general world that our game will live in, and have yet to create the specific 3D models that will populate our game. In the next couple
+	<div>
+		<h3> Current Progress </h3>	
+		<p>
+			In line with our tentative timeline, we have learned the basics of LibGDX and have imported starter code for our game. Additionally, we have also 
+      created many classes to deal with the physics that our world is subject to, from basic forces like gravity and acceleration to more advanced concepts like collision detection.
+      We have also begun to create the track with heightmaps that will be turned into meshes that we will hopefully map textures onto to create a fully formed track. We have yet to create many
+      models for the environment and the cars themselves, but this will come in the following week. 
+		</p>
+		<p>
+			Implementing physics, in particular, was rough.
+			Originally, we intended to roll out our own physics engine. It used Modified Euler, and had entities move around by means of forces placed on the center.
+			Then we would resolve collisions by seeing where the entity would have went without an intersection, and moved those positions to the bounds of the intersection.
+			Thus, we would test collisions by means of any axis-aligned bounding box (AABB) intersections between entities and ray-triangle intersections between the entities
+			and the track. While this worked for most situations, moving at very certain angles would cause the ray intersections to fail, and would make the entities
+			move through the track. Coupled with the lack of accurate intersections and rotations, this problem seemed too frustrating.
+		</p>
+		<p>
+			Instead, we ended up using an existing physics engine to model our entities. In particular, we used the Bullet engine, a popular physics engine used for
+			AAA games like Grand Theft Auto. We used a Bullet wrapper for Java, which had plenty of shortcomings. While the Bullet wrapper allows Java applications to call
+			the Bullet library, calls to the library have no guarantees of memory safety or automatic garbage collection, unlike the Java virtual machine. Thus, we had
+			to keep track of every single allocated object, and dispose of them when not in use. If we don't, the memory leaks would rapidly multiply, as we update the game
+			60 frames per second.
+		</p>
+		<p>
+			Regardless, we ended up modeling the entity as a rigid body. The entity is moved by applying forces to the center of the rigid body; in other words, the center of mass.
+			The physics engine is stepped every 1/60 of a second (60 FPS) and resolves not only all collisions for us but also torque and rotation of the bodies.
+		</p>
+		<p>
+			We decided to make the terrain of the track a heightmap for now. While this prevents floor-over-floor scenarios
+			(like a dark cave, under a bridge, etc.), it allows us to quickly create tracks just by modifying a heightmap, which can be just a 2D array of floats. Creating the geometry for the
+			heightmap was slightly troublesome; we had to
+			<ol>
+				<li> define all the positions of the vertices of the heightmap </li>
+				<li> define all the normals of the vertices of the heightmap. For every triangle, we took the normalized cross product of the difference between the vertices.</li>
+				<li> define all the indices of the heightmap. We were able to follow a pattern to make this a lot easier to loop through. </li>
+				<li> define all the indices such that they were all winded clockwise. This allows OpenGL to cull the back faces and save a lot of time on rendering. </li>
+			</ol>
+		</p>
+		<div class="flexContainer">
+			<figure>
+				<img src="./images/test_1.gif" alt="GIF of car moving about">
+				<figcaption>
+					Our car moving around. The lighting of the environment is given by (a) an ambient light, (b) a diffuse component, and (c) and a specular component.
+				</figcaption>
+			</figure>
+			<figure>
+				<img src="./images/test_2.gif" alt="GIF of the terrain">
+				<figcaption>
+					Zooming out of the terrain
+				</figcaption>
+			</figure>
+		</div>
+	</div>
+		<h3>
+			Preliminary Results
+		</h3>
+    <p>So far, we have created a general world that our game will live in, and have yet to create the specific 3D models that will populate our game. In the next couple
         of weeks, the goal for this week is to create the 3D models for cars, trees, and other objects in the world. And next week, it is to integrate them into the world and try and perfect the user controls for the game. </p>
 
+	<h3>
+		Updated Goals
+	</h3>
 	<p>
-		Updated Goals: The main goal is to complete a well made game that is free of bugs and make it fun for users to play with. To do this we must accomplish multiple things:
+		The main goal is to complete a well made game that is free of bugs and make it fun for users to play with. To do this we must accomplish multiple things:
 			<ul>
                 <li>Create the 3D models for cars that will populate the game</li>
                 <li>Integrate these models seemlessly with the game physics</li>
@@ -76,7 +155,14 @@
 		Tentative Week 4: Integrate these models into the LibGDX project and perfect user controls of the cars, add more game functions like placement and lap times. If time permits, add anti-aliasing and other optimizations.
     </p>
     
-    <h3>Milestone Video: <a href="milestone.mp4">Video</a> </h3>
+    <h3>
+			<a href="milestone.mp4">Milestone Video</a>
+		</h3>
+
+		<video class="video" controls>
+			<source src="milestone.mp4" type="video/mp4">
+			Can't play the video. Click on the link above to download the video.
+		</video>
     
     <h3>Conclusion</h3>
     <p> We met a good amount of our goals in the first two weeks, and though we did not build many of the assets yet, we have exchanged that goal with creating a solid world for the game that will act as a solid foundation which
