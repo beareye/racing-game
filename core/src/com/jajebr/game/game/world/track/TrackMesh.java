@@ -50,7 +50,7 @@ public class TrackMesh implements RenderableProvider {
 
     public TrackMesh() {
         trackHeightmap = new TrackHeightmap();
-        testMaterial = new Material(ColorAttribute.createDiffuse(Color.GREEN));
+        testMaterial = new Material(ColorAttribute.createDiffuse(Color.ORANGE));
 
         this.createVerticesFromHeightmap();
         compileVerticesAndIndices();

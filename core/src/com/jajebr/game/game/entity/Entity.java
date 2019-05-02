@@ -1,30 +1,21 @@
 package com.jajebr.game.game.entity;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
-import com.badlogic.gdx.utils.Array;
 import com.jajebr.game.engine.Constants;
 import com.jajebr.game.engine.Director;
 import com.jajebr.game.engine.Utilities;
-import com.jajebr.game.game.Content;
 import com.jajebr.game.game.world.World;
 
 /**
@@ -45,7 +36,10 @@ public abstract class Entity {
 
     private Vector3 position;
     private Quaternion rotationQuaternion;
-    private Vector3 front;
+
+    private Vector3 relativeX;
+    private Vector3 relativeY;
+    private Vector3 relativeZ;
 
     private Vector3 maxAngularVelocity;
 
@@ -108,11 +102,27 @@ public abstract class Entity {
     }
 
     /**
+     * Returns the X-axis relative to the object
+     * @return the x-axis in object space
+     */
+    public Vector3 getRelativeX() {
+        return relativeX;
+    }
+
+    /**
+     * Returns the Y-axis relative to the object.
+     * @return the y-axis in object space
+     */
+    public Vector3 getRelativeY() {
+        return relativeY;
+    }
+
+    /**
      * Returns a vector that points out of the entity.
      * @return the front vector that points out of the entity's direction
      */
-    public Vector3 getFront() {
-        return front;
+    public Vector3 getRelativeZ() {
+        return relativeZ;
     }
 
     public Entity(World newWorld, Model model, float newMass) {
@@ -122,7 +132,9 @@ public abstract class Entity {
         this.mass = newMass;
         this.position = new Vector3();
         this.rotationQuaternion = new Quaternion();
-        this.front = new Vector3();
+        this.relativeX = new Vector3();
+        this.relativeY = new Vector3();
+        this.relativeZ = new Vector3();
 
         this.maxAngularVelocity = new Vector3(5f, 5f, 5f);
 
@@ -151,7 +163,7 @@ public abstract class Entity {
         this.rigidBody.setContactCallbackFlag(Constants.ENTITY_BITFLAG);
         this.rigidBody.setContactCallbackFilter(Constants.ENTITY_BITFLAG);
 
-        this.rigidBody.setUserValue(this.world.getEntityIndex());
+        this.rigidBody.setUserValue(this.world.getNextEntityIndex());
 
         world.addEntity(this);
     }
@@ -182,8 +194,12 @@ public abstract class Entity {
         this.modelInstance.transform.getRotation(rotationQuaternion);
         this.modelInstance.transform.getTranslation(position);
 
-        this.front.set(Vector3.Z);
-        this.rotationQuaternion.transform(this.front);
+        this.relativeX.set(Vector3.X);
+        this.relativeY.set(Vector3.Y);
+        this.relativeZ.set(Vector3.Z);
+        this.rotationQuaternion.transform(this.relativeX);
+        this.rotationQuaternion.transform(this.relativeY);
+        this.rotationQuaternion.transform(this.relativeZ);
     }
 
     /**
@@ -209,16 +225,17 @@ public abstract class Entity {
      * @param cam the camera
      */
     public void pullCameraBehind(Camera cam) {
-        Vector3 relativeZ = new Vector3(this.front);
+        Vector3 relativeZ = new Vector3(this.relativeZ);
         relativeZ.y = 0f;
         relativeZ.nor();
 
         float pullback = 150f;
-        float t = this.getRigidBody().getLinearVelocity().len2() / 8000;
+        float yPullback = 66f;
+        float t = this.getRigidBody().getLinearVelocity().len2() / 10000;
         t = MathUtils.clamp(t, 0, 1);
         pullback += Utilities.quadraticEasing(0f, 100f, t);
         cam.position.set(relativeZ).scl(-pullback).add(this.getPosition());
-        cam.position.add(0f, cam.viewportHeight / 8f, 0f);
+        cam.position.add(0f, yPullback, 0f);
         cam.direction.set(relativeZ);
         cam.up.set(Vector3.Y);
     }

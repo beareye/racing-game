@@ -2,8 +2,11 @@ package com.jajebr.game.game.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.DebugDrawer;
@@ -13,14 +16,16 @@ import com.badlogic.gdx.physics.bullet.collision.btDbvtBroadphase;
 import com.badlogic.gdx.physics.bullet.collision.btDefaultCollisionConfiguration;
 import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver;
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
-import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
 import com.badlogic.gdx.physics.bullet.linearmath.btIDebugDraw;
 import com.badlogic.gdx.utils.Array;
 import com.jajebr.game.engine.Constants;
 import com.jajebr.game.engine.Director;
+import com.jajebr.game.game.Content;
 import com.jajebr.game.game.entity.Entity;
 import com.jajebr.game.game.world.track.Track;
+
+import java.util.Iterator;
 
 /**
  * The game world.
@@ -30,6 +35,7 @@ public class World {
     private float dragCoefficient;
     private Environment environment;
     private Track track;
+    private Skybox skybox;
 
     private Array<Entity> entities;
 
@@ -96,6 +102,8 @@ public class World {
         environment.set(ColorAttribute.createDiffuse(0.6f, 0.6f, 0.6f, 1.0f));
         environment.set(ColorAttribute.createSpecular(0.8f, 0.8f, 0.8f, 1.0f));
 
+        skybox = new Skybox();
+
         collisionConfiguration = new btDefaultCollisionConfiguration();
         collisionDispatcher = new btCollisionDispatcher(collisionConfiguration);
         broadphase = new btDbvtBroadphase();
@@ -132,7 +140,7 @@ public class World {
     /**
      * Returns an index of the entity in the entity array.
      */
-    public int getEntityIndex() {
+    public int getNextEntityIndex() {
         return entities.size;
     }
 
@@ -162,6 +170,8 @@ public class World {
      * @param modelBatch the model batch
      */
     public void render(ModelBatch modelBatch) {
+        modelBatch.render(skybox);
+
         if (!Gdx.input.isKeyPressed(Input.Keys.O) && entities.size > 0) {
             entities.get(0).pullCameraBehind(modelBatch.getCamera());
         }

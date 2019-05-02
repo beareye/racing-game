@@ -22,6 +22,7 @@ public class Content {
     private static AssetManager assetManager = new AssetManager();
 
     public static Model formulaStar;
+    public static Model inwardCube;
     public static BitmapFont debugFont;
     public static Texture testTexture;
 
@@ -29,6 +30,7 @@ public class Content {
 
     public static void init() {
         assetManager.load("formulastar/formulastar.obj", Model.class);
+        assetManager.load("inwardCube.obj", Model.class);
         assetManager.load("testTexture.png", Texture.class);
         debugFont = new BitmapFont();
 
@@ -42,6 +44,7 @@ public class Content {
 
     public static void load() {
         formulaStar = assetManager.get("formulastar/formulastar.obj", Model.class);
+        inwardCube = assetManager.get("inwardCube.obj", Model.class);
         testTexture = assetManager.get("testTexture.png", Texture.class);
     }
 
