@@ -10,6 +10,8 @@ import com.badlogic.gdx.graphics.g3d.RenderableProvider;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
@@ -18,6 +20,7 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.ShortArray;
 import com.jajebr.game.engine.Director;
+import com.jajebr.game.engine.Utilities;
 import com.jajebr.game.game.Content;
 
 /**
@@ -27,6 +30,7 @@ public class TrackMesh implements RenderableProvider {
     private TrackHeightmap trackHeightmap;
     private float[] vertices;
     private short[] indices;
+    private Vector2 startPoint;
 
     private Mesh trackMesh;
     private Material testMaterial;
@@ -41,21 +45,21 @@ public class TrackMesh implements RenderableProvider {
 
     /**
      * Returns the components for each vertex.
-     * In this case: position (3) + normal (3)
+     * In this case: position (3) + normal (3) + texture (2)
      * @return the amount of components for each vertex
      */
     public int getComponentsPerVertex() {
-        return 6;
+        return 8;
     }
 
     public TrackMesh() {
         trackHeightmap = new TrackHeightmap();
-        testMaterial = new Material(ColorAttribute.createDiffuse(Color.ORANGE));
+        testMaterial = new Material(TextureAttribute.createDiffuse(Content.materials));
 
         this.createVerticesFromHeightmap();
         compileVerticesAndIndices();
 
-        trackMesh = new Mesh(true, this.getAmountOfVertices(), indices.length, VertexAttribute.Position(), VertexAttribute.Normal());
+        trackMesh = new Mesh(true, this.getAmountOfVertices(), indices.length, VertexAttribute.Position(), VertexAttribute.Normal(), VertexAttribute.TexCoords(0));
         trackMesh.setVertices(this.vertices);
         trackMesh.setIndices(this.indices);
     }
@@ -81,14 +85,40 @@ public class TrackMesh implements RenderableProvider {
                 Vector3 normal1 = getNormal(topLeft, bottomLeft, topRight);
                 Vector3 normal2 = getNormal(topRight, bottomLeft, bottomRight);
 
+                TrackTexture topLeftTexture = this.trackHeightmap.getTextureAt(x, y);
+                TrackTexture topRightTexture = this.trackHeightmap.getTextureAt(x + 1, y);
+                TrackTexture bottomLeftTexture = this.trackHeightmap.getTextureAt(x, y + 1);
+                TrackTexture bottomRightTexture = this.trackHeightmap.getTextureAt(x + 1, y + 1);
+
+                // Fix textures.
+                if (!Utilities.allSame(topLeftTexture, topRightTexture, bottomLeftTexture, bottomRightTexture)) {
+                    TrackTexture reference = this.findNotRoad(topLeftTexture, topRightTexture, bottomLeftTexture, bottomRightTexture);
+                    // TODO: not all textures are properly fixed (check the corners of the road)
+                    if (this.fixTexturesIfNeeded(normal1)) {
+                        topLeftTexture = reference;
+                        topRightTexture = reference;
+                        bottomLeftTexture = reference;
+                    }
+                    if (this.fixTexturesIfNeeded(normal2)) {
+                        topRightTexture = reference;
+                        bottomLeftTexture = reference;
+                        bottomRightTexture = reference;
+                    }
+                }
+
+                Vector2 topLeftTex = this.getTextureUV(topLeftTexture,true, true, x, y);
+                Vector2 topRightTex = this.getTextureUV(topRightTexture, true, false, x + 1, y);
+                Vector2 bottomLeftTex = this.getTextureUV(bottomLeftTexture, false, true, x, y + 1);
+                Vector2 bottomRightTex = this.getTextureUV(bottomRightTexture, false, false, x + 1, y + 1);
+
                 indexI = this.addIndices(indexI, indexI, indexI + 1, indexI + 2, indexI + 3, indexI + 4, indexI + 5);
 
-                vertexI = this.addVertex(vertexI, topLeft, normal1);
-                vertexI = this.addVertex(vertexI, bottomLeft, normal1);
-                vertexI = this.addVertex(vertexI, topRight, normal1);
-                vertexI = this.addVertex(vertexI, topRight, normal2);
-                vertexI = this.addVertex(vertexI, bottomLeft, normal2);
-                vertexI = this.addVertex(vertexI, bottomRight, normal2);
+                vertexI = this.addVertex(vertexI, topLeft, normal1, topLeftTex);
+                vertexI = this.addVertex(vertexI, bottomLeft, normal1, bottomLeftTex);
+                vertexI = this.addVertex(vertexI, topRight, normal1, topRightTex);
+                vertexI = this.addVertex(vertexI, topRight, normal2, topRightTex);
+                vertexI = this.addVertex(vertexI, bottomLeft, normal2, bottomLeftTex);
+                vertexI = this.addVertex(vertexI, bottomRight, normal2, bottomRightTex);
             }
         }
     }
@@ -112,6 +142,37 @@ public class TrackMesh implements RenderableProvider {
         return vertex.scl(this.getTrackHeightmap().getScaling());
     }
 
+    private Vector2 getTextureUV(TrackTexture texture, boolean top, boolean left, int x, int y) {
+        Rectangle rectangle = Content.getMaterialTextureUV(texture);
+        float u = rectangle.x;
+        if (!left) {
+            u = rectangle.x + rectangle.width;
+        }
+        float v = rectangle.y;
+        if (!top) {
+            v = rectangle.y + rectangle.height;
+        }
+
+        return new Vector2(u, v);
+    }
+
+    /**
+     * Fixes the textures created from the heightmap to avoid conflicting textures in inclines.
+     * @return a texture for all four vertices
+     */
+    private boolean fixTexturesIfNeeded(Vector3 normal) {
+        return normal.dot(Vector3.Y) < 0.95;
+    }
+
+    private TrackTexture findNotRoad(TrackTexture... textures) {
+        for (TrackTexture texture : textures) {
+            if (texture != TrackTexture.ROAD) {
+                return texture;
+            }
+        }
+        return TrackTexture.NONE;
+    }
+
     private Vector3 getNormal(Vector3 point1, Vector3 point2, Vector3 point3) {
         Vector3 diff1 = new Vector3(point2).sub(point1);
         Vector3 diff2 = new Vector3(point3).sub(point1);
@@ -119,14 +180,16 @@ public class TrackMesh implements RenderableProvider {
         return diff1.crs(diff2).nor();
     }
 
-    private int addVertex(int counter, Vector3 vertex, Vector3 normal) {
+    private int addVertex(int counter, Vector3 vertex, Vector3 normal, Vector2 uv) {
         this.vertices[counter] = vertex.x;
         this.vertices[counter + 1] = vertex.y;
         this.vertices[counter + 2] = vertex.z;
         this.vertices[counter + 3] = normal.x;
         this.vertices[counter + 4] = normal.y;
         this.vertices[counter + 5] = normal.z;
-        return counter + 6;
+        this.vertices[counter + 6] = uv.x;
+        this.vertices[counter + 7] = uv.y;
+        return counter + this.getComponentsPerVertex();
     }
 
     private int addIndex(int counter, short vertexNumber) {

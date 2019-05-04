@@ -21,6 +21,7 @@ public class TrackHeightmap {
 
     private FloatBuffer floatBuffer;
     private float[] heightmap;
+    private TrackTexture[] textures;
     private boolean[] valid;
     private int width;
     private int height;
@@ -54,6 +55,10 @@ public class TrackHeightmap {
         return heightmap;
     }
 
+    public TrackTexture[] getTextures() {
+        return textures;
+    }
+
     public boolean[] getValidSpace() {
         return valid;
     }
@@ -84,6 +89,7 @@ public class TrackHeightmap {
 
     public void createHeightmap() {
         heightmap = new float[width * height];
+        textures = new TrackTexture[width * height];
         valid = new boolean[width * height];
 
         this.trackCreator.create();
@@ -132,6 +138,25 @@ public class TrackHeightmap {
             this.heightmap[x + y * this.width] = height;
             this.valid[x + y * this.width] = true;
         }
+    }
+
+    /**
+     * Sets the texture at the particular point of the heightmap.
+     * @param x the x-coordinate
+     * @param y the y-coordinate
+     * @param trackTexture the height
+     */
+    public void setTexture(int x, int y, TrackTexture trackTexture) {
+        if (this.inBounds(x, y)) {
+            this.textures[x + y * this.width] = trackTexture;
+        }
+    }
+
+    public TrackTexture getTextureAt(int x, int y) {
+        if (!this.inBounds(x, y)) {
+            return null;
+        }
+        return this.textures[x + y * this.getWidth()];
     }
 
     public void dispose() {

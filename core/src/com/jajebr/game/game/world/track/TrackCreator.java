@@ -10,13 +10,18 @@ import com.jajebr.game.engine.Director;
  */
 public class TrackCreator {
     private TrackHeightmap trackHeightmap;
-    
+    private TrackTexture trackTexture;
+
     /**
      * Initialize a TrackCreator.
      * @param existingTrackHeightmap the heightmap
      */
     public TrackCreator(TrackHeightmap existingTrackHeightmap) {
         this.trackHeightmap = existingTrackHeightmap;
+        this.trackTexture = TrackTexture.SAND;
+        if (MathUtils.randomBoolean()) {
+            this.trackTexture = TrackTexture.GRASS;
+        }
     }
 
     /**
@@ -26,8 +31,9 @@ public class TrackCreator {
         // Create the hills of the track
         for (int y = 0; y < trackHeightmap.getHeight(); y++) {
             for (int x = 0; x < trackHeightmap.getWidth(); x++) {
-                float longHill = MathUtils.cos( 0.1f * x) * 0.2f + MathUtils.sin(0.1f * y) * 0.2f + 0.6f;
+                float longHill = MathUtils.cos( 0.1f * x) * 0.15f + MathUtils.sin(0.1f * y) * 0.15f + 0.6f;
                 trackHeightmap.setInvalidHeight(x, y, longHill);
+                trackHeightmap.setTexture(x, y, this.trackTexture);
             }
         }
 
@@ -54,6 +60,7 @@ public class TrackCreator {
         for (int iy = y - diameter; iy <= y + diameter; iy++) {
             for (int ix = x - diameter; ix <= x + diameter; ix++) {
                 this.trackHeightmap.setValidHeight(ix, iy, height);
+                this.trackHeightmap.setTexture(ix, iy, TrackTexture.ROAD);
             }
         }
     }

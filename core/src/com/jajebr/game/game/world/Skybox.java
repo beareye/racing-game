@@ -39,6 +39,13 @@ public class Skybox extends ModelInstance {
         this(Color.SKY, 250f);
     }
 
+    public Skybox(boolean nighttime) {
+        this();
+        if (nighttime) {
+            this.changeColor(Color.BLACK);
+        }
+    }
+
     /**
      * Changes the color of the skybox.
      * @param newColor the new color

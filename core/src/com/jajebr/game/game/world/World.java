@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.DebugDrawer;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionConfiguration;
@@ -36,6 +37,7 @@ public class World {
     private Environment environment;
     private Track track;
     private Skybox skybox;
+    private boolean nighttime;
 
     private Array<Entity> entities;
 
@@ -93,16 +95,21 @@ public class World {
         gravity = 9.8f;
         dragCoefficient = 0.5f;
         track = new Track(this, "test track");
+        nighttime = MathUtils.randomBoolean();
 
         entities = new Array<Entity>();
 
         // Basic lights
         environment = new Environment();
-        environment.set(ColorAttribute.createAmbient(0.7f, 0.7f, 0.7f, 1.0f));
-        environment.set(ColorAttribute.createDiffuse(0.6f, 0.6f, 0.6f, 1.0f));
+        if (nighttime) {
+            environment.set(ColorAttribute.createAmbient(0.5f, 0.5f, 0.5f, 1.0f));
+        } else {
+            environment.set(ColorAttribute.createAmbient(1f, 1f, 1f, 1.0f));
+        }
+        environment.set(ColorAttribute.createDiffuse(0.7f, 0.7f, 0.7f, 1.0f));
         environment.set(ColorAttribute.createSpecular(0.8f, 0.8f, 0.8f, 1.0f));
 
-        skybox = new Skybox();
+        skybox = new Skybox(nighttime);
 
         collisionConfiguration = new btDefaultCollisionConfiguration();
         collisionDispatcher = new btCollisionDispatcher(collisionConfiguration);

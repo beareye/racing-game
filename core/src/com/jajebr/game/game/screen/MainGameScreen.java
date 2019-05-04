@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.jajebr.game.engine.Constants;
 import com.jajebr.game.engine.renderer.SpecialShapeRenderer;
 import com.jajebr.game.engine.screen.Screen;
@@ -16,6 +17,8 @@ import com.jajebr.game.game.world.World;
 
 public class MainGameScreen extends Screen {
     private PerspectiveCamera cam;
+    private ScreenViewport screenViewport;
+
     private ModelBatch modelBatch;
     private SpecialShapeRenderer shapeRenderer;
     private SpriteBatch spriteBatch;
@@ -33,6 +36,7 @@ public class MainGameScreen extends Screen {
         cam.near = 0.1f;
         cam.far = 10000f;
         cam.update();
+        screenViewport = new ScreenViewport(cam);
 
         modelBatch = new ModelBatch();
         shapeRenderer = new SpecialShapeRenderer();
@@ -68,6 +72,7 @@ public class MainGameScreen extends Screen {
 
     @Override
     public void resize(int w, int h) {
+        screenViewport.update(w, h);
         cam.viewportWidth = w;
         cam.viewportHeight = h;
         cam.update();

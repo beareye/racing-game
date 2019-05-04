@@ -25,4 +25,22 @@ public class Utilities {
         }
         return rad;
     }
+
+    /**
+     * Returns if the values are all the same.
+     * @param values an array of objects
+     * @return whether all the values are the same or not
+     */
+    public static boolean allSame(Object... values) {
+        if (values.length == 0) {
+            return false;
+        }
+        Object pivot = values[0];
+        for (Object value : values) {
+            if (!pivot.equals(value)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

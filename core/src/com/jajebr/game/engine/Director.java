@@ -29,6 +29,7 @@ public class Director {
         if (fullscreen) {
             Gdx.graphics.setWindowedMode(Gdx.graphics.getDisplayMode().width, Gdx.graphics.getDisplayMode().height);
         } else {
+            Director.log(Gdx.graphics.getDisplayMode().toString());
             Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
         }
         fullscreen = !fullscreen;

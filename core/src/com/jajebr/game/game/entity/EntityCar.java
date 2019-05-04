@@ -2,6 +2,8 @@ package com.jajebr.game.game.entity;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
@@ -17,6 +19,8 @@ public class EntityCar extends Entity {
     private float turnTorque;
     private boolean tiltLeft;
     private boolean tiltRight;
+    private float tiltDeg;
+    private float tiltTime;
 
     private float dragDamping;
     private float angularDamping;
@@ -26,6 +30,7 @@ public class EntityCar extends Entity {
     private float resetFeedbackFactor;
 
     private Quaternion extraRotation;
+    private Quaternion extraRotationReverse;
 
     private ClosestRayResultCallback rayResultCallback;
 
@@ -36,15 +41,19 @@ public class EntityCar extends Entity {
 
         this.dragDamping = 0.4f;
         this.angularDamping = 0.8f;
-        this.desiredAltitude = 33f;
+        this.desiredAltitude = 66f;
         this.getRigidBody().setDamping(dragDamping, this.angularDamping);
 
         // Zero-gravity
         this.getRigidBody().setGravity(new Vector3());
 
         this.turnTorque = 2500000f;
+        this.tiltDeg = 25f;
+        this.tiltTime = 0.25f;
         this.resetThreshold = 0.05f;
         this.resetFeedbackFactor = 1.75f;
+        this.extraRotation = new Quaternion();
+        this.extraRotationReverse = new Quaternion();
 
         // TODO: remove
         this.getRigidBody().translate(new Vector3(900f, -100f, 0f));
@@ -69,19 +78,41 @@ public class EntityCar extends Entity {
             this.setTiltLeft(true);
             this.setTiltRight(false);
 
+            float roll = extraRotation.getRoll();
+            float newRoll = roll - this.tiltDeg * dt / this.tiltTime;
+            newRoll = Math.max(newRoll, -this.tiltDeg);
+            extraRotation.setEulerAngles(0f, 0f, newRoll);
+
             this.getRigidBody().applyTorque(this.getRelativeY().cpy().scl(turnTorque));
         } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             this.setTiltLeft(false);
             this.setTiltRight(true);
 
+            float roll = extraRotation.getRoll();
+            float newRoll = roll + this.tiltDeg * dt / this.tiltTime;
+            newRoll = Math.min(newRoll, this.tiltDeg);
+            extraRotation.setEulerAngles(0f, 0f, newRoll);
+
             this.getRigidBody().applyTorque(this.getRelativeY().cpy().scl(-turnTorque));
         } else {
             this.setTiltLeft(false);
             this.setTiltRight(false);
+
+            float roll = extraRotation.getRoll();
+            float newRoll = roll - roll * dt / this.tiltTime;
+            extraRotation.setEulerAngles(0f, 0f, newRoll);
         }
 
         this.recenterOrientation();
         this.putCarAbove(this.getWorld());
+    }
+
+    @Override
+    public void render(ModelBatch batch, Environment environment) {
+        extraRotationReverse.set(extraRotation).conjugate();
+        this.getModelInstance().transform.rotate(extraRotation);
+        super.render(batch, environment);
+        this.getModelInstance().transform.rotate(extraRotationReverse);
     }
 
     private void putCarAbove(World world) {
@@ -101,7 +132,7 @@ public class EntityCar extends Entity {
             float altitude = this.getPosition().y - point.y;
 
             Vector3 linearVelocity = this.getRigidBody().getLinearVelocity();
-            linearVelocity.y = (this.desiredAltitude - altitude) / 2;
+            linearVelocity.y = (this.desiredAltitude - altitude) / 2f;
             this.getRigidBody().setLinearVelocity(linearVelocity);
         }
     }
@@ -113,17 +144,15 @@ public class EntityCar extends Entity {
         float pitch = this.getRotationQuaternion().getPitchRad();
         float roll = this.getRotationQuaternion().getRollRad();
 
-        Director.log("Pitch: " + pitch);
-        Director.log("Roll: " + roll);
 
         Vector3 angularVelocity = this.getRigidBody().getAngularVelocity();
+        // TODO: retune for finer movement (and less jarring motions)
         if (Math.abs(pitch) > this.resetThreshold) {
             angularVelocity.x = -pitch * resetFeedbackFactor;
         }
         if (Math.abs(roll) > this.resetThreshold) {
             angularVelocity.z = -roll * resetFeedbackFactor;
         }
-        Director.log(angularVelocity.toString());
         this.getRigidBody().setAngularVelocity(angularVelocity);
     }
 
