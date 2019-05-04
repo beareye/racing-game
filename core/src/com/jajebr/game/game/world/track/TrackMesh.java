@@ -119,17 +119,14 @@ public class TrackMesh implements RenderableProvider {
         return diff1.crs(diff2).nor();
     }
 
-    private int addVertex(int counter, float x, float y, float z, float nx, float ny, float nz) {
-        this.vertices[counter] = x;
-        this.vertices[counter + 1] = y;
-        this.vertices[counter + 2] = z;
-        this.vertices[counter + 3] = nx;
-        this.vertices[counter + 4] = ny;
-        this.vertices[counter + 5] = nz;
-        return counter + 6;
-    }
     private int addVertex(int counter, Vector3 vertex, Vector3 normal) {
-        return this.addVertex(counter, vertex.x, vertex.y, vertex.z, normal.x, normal.y, normal.z);
+        this.vertices[counter] = vertex.x;
+        this.vertices[counter + 1] = vertex.y;
+        this.vertices[counter + 2] = vertex.z;
+        this.vertices[counter + 3] = normal.x;
+        this.vertices[counter + 4] = normal.y;
+        this.vertices[counter + 5] = normal.z;
+        return counter + 6;
     }
 
     private int addIndex(int counter, short vertexNumber) {

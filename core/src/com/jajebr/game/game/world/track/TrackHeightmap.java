@@ -102,14 +102,23 @@ public class TrackHeightmap {
     }
 
     /**
+     * Returns whether the heightmap is in bounds or not.
+     * @param x the x-coordinate
+     * @param y the y-coordinate
+     * @return whether in bounds or not
+     */
+    public boolean inBounds(int x, int y) {
+        return !(x < 0 || x >= this.width || y < 0 || y >= this.height);
+    }
+
+    /**
      * Sets a place in the heightmap to a height, and then marks it as valid.
      */
     public void setValidHeight(int x, int y, float height) {
-        if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
-            return;
+        if (this.inBounds(x, y)) {
+            this.heightmap[x + y * this.width] = height;
+            this.valid[x + y * this.width] = true;
         }
-        this.heightmap[x + y * this.width] = height;
-        this.valid[x + y * this.width] = true;
     }
 
     /**
@@ -119,11 +128,10 @@ public class TrackHeightmap {
      * @param height the height
      */
     public void setInvalidHeight(int x, int y, float height) {
-        if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
-            return;
+        if (this.inBounds(x, y)) {
+            this.heightmap[x + y * this.width] = height;
+            this.valid[x + y * this.width] = true;
         }
-        this.heightmap[x + y * this.width] = height;
-        this.valid[x + y * this.width] = true;
     }
 
     public void dispose() {

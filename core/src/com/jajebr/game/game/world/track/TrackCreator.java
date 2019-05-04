@@ -10,9 +10,7 @@ import com.jajebr.game.engine.Director;
  */
 public class TrackCreator {
     private TrackHeightmap trackHeightmap;
-
-    private Array<Vector2> waypoints;
-
+    
     /**
      * Initialize a TrackCreator.
      * @param existingTrackHeightmap the heightmap
@@ -28,8 +26,34 @@ public class TrackCreator {
         // Create the hills of the track
         for (int y = 0; y < trackHeightmap.getHeight(); y++) {
             for (int x = 0; x < trackHeightmap.getWidth(); x++) {
-                float longHill = MathUtils.sin(0.01f * x * y) * 0.3f + 0.7f;
+                float longHill = MathUtils.cos( 0.1f * x) * 0.2f + MathUtils.sin(0.1f * y) * 0.2f + 0.6f;
                 trackHeightmap.setInvalidHeight(x, y, longHill);
+            }
+        }
+
+        // Create the track as a polar equation.
+        float thetaStep = 1f;
+        float amplitude = (this.trackHeightmap.getWidth() / 2f) / 4f;
+
+        int centerX = this.trackHeightmap.getWidth() / 2;
+        int centerY = this.trackHeightmap.getHeight() / 2;
+
+        for (float theta = 0f; theta <= 360f; theta += thetaStep) {
+            float r = 2 - MathUtils.cosDeg(theta) * MathUtils.sinDeg(3f * theta);
+            float x = r * MathUtils.cosDeg(theta) * amplitude;
+            float y = r * MathUtils.sinDeg(theta) * amplitude;
+
+            int finalX = (int) x + centerX;
+            int finalY = (int) y + centerY;
+
+            this.plotWithDiameter(finalX, finalY, 2, 0.1f);
+        }
+    }
+
+    private void plotWithDiameter(int x, int y, int diameter, float height) {
+        for (int iy = y - diameter; iy <= y + diameter; iy++) {
+            for (int ix = x - diameter; ix <= x + diameter; ix++) {
+                this.trackHeightmap.setValidHeight(ix, iy, height);
             }
         }
     }
