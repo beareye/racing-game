@@ -30,7 +30,6 @@ public class TrackMesh implements RenderableProvider {
     private TrackHeightmap trackHeightmap;
     private float[] vertices;
     private short[] indices;
-    private Vector2 startPoint;
 
     private Mesh trackMesh;
     private Material testMaterial;
@@ -123,7 +122,13 @@ public class TrackMesh implements RenderableProvider {
         }
     }
 
-    private Vector3 getVertex(int x, int y) {
+    /**
+     * Gets the world-space vertex at that location.
+     * @param x the x-coordinate of the heightmap
+     * @param y the y-coordinate of the heightmap
+     * @return a world-space representation
+     */
+    public Vector3 getVertex(int x, int y) {
         float height = this.getTrackHeightmap().getHeightmap()[x + y * this.getTrackHeightmap().getWidth()];
 
         float mWidth = this.getTrackHeightmap().getWidth() - 1;
@@ -139,7 +144,9 @@ public class TrackMesh implements RenderableProvider {
                 (-mHeight / 2f) + y
         );
 
-        return vertex.scl(this.getTrackHeightmap().getScaling());
+        vertex.scl(this.getTrackHeightmap().getScaling());
+
+        return vertex;
     }
 
     private Vector2 getTextureUV(TrackTexture texture, boolean top, boolean left, int x, int y) {

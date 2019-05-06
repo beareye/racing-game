@@ -12,13 +12,26 @@ public class Director {
     private static boolean fullscreen = false;
 
     private static Screen currentScreen;
+    private static Screen nextScreen;
 
     public static Screen getCurrentScreen() {
         return currentScreen;
     }
 
-    public static void setCurrentScreen(Screen newScreen) {
-        currentScreen = newScreen;
+    public static Screen getNextScreen() {
+        return nextScreen;
+    }
+
+    public static void changeScreen(Screen newScreen) {
+        nextScreen = newScreen;
+    }
+
+    public static void changeScreens() {
+        if (currentScreen != null) {
+            currentScreen.dispose();
+        }
+        currentScreen = nextScreen;
+        nextScreen = null;
     }
 
     public static void log(String message) {

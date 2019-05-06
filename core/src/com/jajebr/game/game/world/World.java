@@ -24,6 +24,7 @@ import com.jajebr.game.engine.Constants;
 import com.jajebr.game.engine.Director;
 import com.jajebr.game.game.Content;
 import com.jajebr.game.game.entity.Entity;
+import com.jajebr.game.game.entity.EntityCar;
 import com.jajebr.game.game.world.track.Track;
 
 import java.util.Iterator;
@@ -110,6 +111,7 @@ public class World {
         environment.set(ColorAttribute.createSpecular(0.8f, 0.8f, 0.8f, 1.0f));
 
         skybox = new Skybox(nighttime);
+        skybox.setScale(track.getTrackMesh().getTrackHeightmap().getScaling().len2());
 
         collisionConfiguration = new btDefaultCollisionConfiguration();
         collisionDispatcher = new btCollisionDispatcher(collisionConfiguration);
@@ -209,6 +211,7 @@ public class World {
         collisionDispatcher.dispose();
         collisionConfiguration.dispose();
         worldContactListener.dispose();
+        debugDrawer.dispose();
 
         track.dispose();
     }

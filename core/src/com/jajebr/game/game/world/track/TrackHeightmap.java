@@ -75,12 +75,16 @@ public class TrackHeightmap {
         return maxHeight;
     }
 
+    public TrackCreator getTrackCreator() {
+        return trackCreator;
+    }
+
     public TrackHeightmap() {
         width = 64;
         height = 64;
         minHeight = 0f;
         maxHeight = 1f;
-        scaling = new Vector3(50f, 500f, 50f);
+        scaling = new Vector3(100f, 500f, 100f);
         trackCreator = new TrackCreator(this);
 
         createHeightmap();

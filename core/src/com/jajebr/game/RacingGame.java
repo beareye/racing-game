@@ -10,7 +10,6 @@ import com.jajebr.game.engine.Director;
 import com.jajebr.game.engine.screen.Screen;
 import com.jajebr.game.game.Content;
 import com.jajebr.game.game.screen.LoadingScreen;
-import com.jajebr.game.game.screen.MainGameScreen;
 
 public class RacingGame extends ApplicationAdapter {
 	private float dtTimer;
@@ -21,7 +20,7 @@ public class RacingGame extends ApplicationAdapter {
 		Bullet.init();
 
 		dtTimer = 0.0f;
-		Director.setCurrentScreen(new LoadingScreen());
+		Director.changeScreen(new LoadingScreen());
 	}
 
 	@Override
@@ -44,6 +43,10 @@ public class RacingGame extends ApplicationAdapter {
 			// Interpolation factor
 			float alpha = dtTimer / Constants.SPF;
 			screen.draw(alpha);
+		}
+
+		if (Director.getNextScreen() != null) {
+			Director.changeScreens();
 		}
 	}
 

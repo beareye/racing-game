@@ -53,4 +53,13 @@ public class Skybox extends ModelInstance {
     public void changeColor(Color newColor) {
         skyboxMaterial.set(ColorAttribute.createDiffuse(newColor));
     }
+
+    /**
+     * Sets the scale of the skybox.
+     * @param newScale the scale
+     */
+    public void setScale(float newScale) {
+        this.scale = newScale;
+        this.transform.setToScaling(this.scale, this.scale, this.scale);
+    }
 }

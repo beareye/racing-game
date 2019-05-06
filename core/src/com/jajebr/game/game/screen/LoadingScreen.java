@@ -14,7 +14,7 @@ public class LoadingScreen extends Screen {
         if (Content.isFinished()) {
             Content.load();
             Director.log("Loading");
-            Director.setCurrentScreen(new MainGameScreen());
+            Director.changeScreen(new MainGameScreen());
         }
     }
 
