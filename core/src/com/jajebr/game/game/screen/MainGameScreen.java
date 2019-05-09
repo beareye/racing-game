@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.jajebr.game.engine.Constants;
 import com.jajebr.game.engine.Director;
@@ -20,25 +21,34 @@ import com.jajebr.game.game.world.World;
 
 public class MainGameScreen extends Screen {
     private ModelBatch modelBatch;
+    private SpriteBatch spriteBatch;
 
     private EntityCar car;
 
     private World world;
-    private Player player;
+    private Array<Player> players;
 
-    public MainGameScreen() {
+    public MainGameScreen(int numPlayers) {
         modelBatch = new ModelBatch();
+        spriteBatch = new SpriteBatch();
 
         world = new World();
         world.getEnvironment().add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -1.0f, -0.8f, 0.2f));
         world.getEnvironment().add(new PointLight().set(0.4f, 0.8f, 0.4f, 100f, 100f, 100f, 100f));
 
-        player = new Player(1, new Rectangle(0f, 0f, 1f, 1f), world);
+        this.players = new Array<Player>();
+        for (int i = 0; i < numPlayers; i++) {
+            Player player = new Player(i, numPlayers, this.world);
+            players.add(player);
+            Director.getPlayerInputController().assignControllerToPlayer(player);
+        }
     }
 
     @Override
     public void update(float dt) {
-        player.update(dt);
+        for (Player player : players) {
+            player.update(dt);
+        }
         world.update(dt);
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.F10)) {
@@ -48,19 +58,25 @@ public class MainGameScreen extends Screen {
 
     @Override
     public void draw(float alpha) {
-        player.draw(modelBatch);
+        for (Player player : players) {
+            player.draw(modelBatch);
+            player.drawHUD(spriteBatch);
+        }
 
         Gdx.graphics.setTitle(Constants.APP_ID + " [FPS: " + Gdx.graphics.getFramesPerSecond() + "]");
     }
 
     @Override
     public void resize(int w, int h) {
-        player.resize(w, h);
+        for (Player player : players) {
+            player.resize(w, h);
+        }
     }
 
     @Override
     public void dispose() {
         world.dispose();
         modelBatch.dispose();
+        spriteBatch.dispose();
     }
 }

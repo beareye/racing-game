@@ -1,5 +1,6 @@
 package com.jajebr.game.engine;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 
 public class Utilities {
@@ -42,5 +43,12 @@ public class Utilities {
             }
         }
         return true;
+    }
+
+    public static Color getColorFromHashcode(Object object) {
+        int hashCode = object.hashCode();
+        int colorBits = hashCode % 0xFFFFFF;
+        int finalColorBits = (colorBits << 8) | 0xFF;
+        return new Color(finalColorBits);
     }
 }

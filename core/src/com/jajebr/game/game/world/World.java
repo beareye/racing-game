@@ -103,7 +103,7 @@ public class World {
         // Basic lights
         environment = new Environment();
         if (nighttime) {
-            environment.set(ColorAttribute.createAmbient(0.5f, 0.5f, 0.5f, 1.0f));
+            environment.set(ColorAttribute.createAmbient(0.6f, 0.6f, 0.6f, 1.0f));
         } else {
             environment.set(ColorAttribute.createAmbient(1f, 1f, 1f, 1.0f));
         }
@@ -111,7 +111,6 @@ public class World {
         environment.set(ColorAttribute.createSpecular(0.8f, 0.8f, 0.8f, 1.0f));
 
         skybox = new Skybox(nighttime);
-        skybox.setScale(track.getTrackMesh().getTrackHeightmap().getScaling().len2());
 
         collisionConfiguration = new btDefaultCollisionConfiguration();
         collisionDispatcher = new btCollisionDispatcher(collisionConfiguration);

@@ -1,6 +1,8 @@
 package com.jajebr.game.game.world.track;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -17,6 +19,7 @@ public class Track {
     private TrackMesh trackMesh;
     private World world;
     private Pixmap pixmap;
+    private Texture pixmapTexture;
 
     private float accceptableDistanceSquaredToGoal;
 
@@ -32,6 +35,10 @@ public class Track {
 
     public Pixmap getPixmap() {
         return pixmap;
+    }
+
+    public Texture getPixmapTexture() {
+        return pixmapTexture;
     }
 
     /**
@@ -71,12 +78,13 @@ public class Track {
         this.trackMesh = new TrackMesh();
         this.world = newWorld;
 
-        accceptableDistanceSquaredToGoal = this.trackMesh.getTrackHeightmap().getScaling().x * this.trackMesh.getTrackHeightmap().getScaling().z * 15;
+        accceptableDistanceSquaredToGoal = this.trackMesh.getTrackHeightmap().getScaling().x * this.trackMesh.getTrackHeightmap().getScaling().z * 30;
 
         this.startingPosition = new Vector3();
         this.assignStartingPosition();
 
         this.pixmap = this.createPixmap();
+        this.pixmapTexture = new Texture(this.pixmap);
     }
 
     private void assignStartingPosition() {
@@ -94,7 +102,7 @@ public class Track {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 TrackTexture texture = this.getTrackHeightmap().getTextureAt(x, y);
-                minimap.drawPixel(x, y, texture.getColor().toIntBits());
+                minimap.drawPixel(x, y, Color.rgba8888(texture.getColor()));
             }
         }
 

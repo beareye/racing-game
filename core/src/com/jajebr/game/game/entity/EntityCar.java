@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.Collision;
 import com.jajebr.game.engine.Director;
 import com.jajebr.game.game.Content;
+import com.jajebr.game.game.player.PlayerInput;
 import com.jajebr.game.game.world.World;
 import com.jajebr.game.game.world.track.Track;
 
@@ -42,7 +43,9 @@ public class EntityCar extends Entity {
 
     private ClosestRayResultCallback rayResultCallback;
 
-    public EntityCar(World world) {
+    private PlayerInput input;
+
+    public EntityCar(World world, PlayerInput playerInput) {
         super(world, Content.formulaStar, 1000f);
 
         this.getRigidBody().setActivationState(Collision.DISABLE_DEACTIVATION);
@@ -65,35 +68,37 @@ public class EntityCar extends Entity {
         this.extraRotation = new Quaternion();
         this.extraRotationReverse = new Quaternion();
         this.drifting = false;
-        this.maxDriftBoost = 600000f;
+        this.maxDriftBoost = 800000f;
         this.driftBoost = 0f;
         this.driftScale = 100000f;
         this.dotWithStartingPosition = Float.NEGATIVE_INFINITY;
 
         this.rayResultCallback = new ClosestRayResultCallback(Vector3.Zero, Vector3.Y);
 
-        thrustForce = 120000f;
-        brakeForce = 100000f;
+        this.input = playerInput;
+
+        thrustForce = 400000f;
+        brakeForce = 375000f;
     }
 
     @Override
     public void update(float dt) {
         super.update(dt);
 
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+        if (this.input.accelerate) {
             this.applyForce(this.getRelativeZ().cpy().scl(thrustForce));
-        } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+        } else if (this.input.reverse) {
             this.applyForce(this.getRelativeZ().cpy().scl(-brakeForce));
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+        if (this.input.leftRight < -this.input.leftRightThreshold) {
             float roll = extraRotation.getRoll();
             float newRoll = roll - this.tiltDeg * dt / this.tiltTime;
             newRoll = Math.max(newRoll, -this.tiltDeg - this.driftDeg);
             extraRotation.setEulerAngles(0f, 0f, newRoll);
 
             this.getRigidBody().applyTorque(this.getRelativeY().cpy().scl(turnTorque));
-        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+        } else if (this.input.leftRight > this.input.leftRightThreshold) {
             float roll = extraRotation.getRoll();
             float newRoll = roll + this.tiltDeg * dt / this.tiltTime;
             newRoll = Math.min(newRoll, this.tiltDeg + this.driftDeg);
@@ -106,7 +111,7 @@ public class EntityCar extends Entity {
             extraRotation.setEulerAngles(0f, 0f, newRoll);
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
+        if (this.input.driftingLeft) {
             this.updateDrifting(dt, true, true);
 
             float roll = extraRotation.getRoll();
@@ -115,7 +120,7 @@ public class EntityCar extends Entity {
             extraRotation.setEulerAngles(0f, 0f, newRoll);
 
             this.getRigidBody().applyTorque(this.getRelativeY().cpy().scl(turnTorque));
-        } else if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+        } else if (this.input.driftingRight) {
             this.updateDrifting(dt, false, true);
 
             float roll = extraRotation.getRoll();
@@ -148,8 +153,6 @@ public class EntityCar extends Entity {
                 this.drifting = false;
                 float driftBoost = Math.min(this.driftBoost, maxDriftBoost);
 
-                Director.log("Drift boost is " + driftBoost);
-
                 // Apply drift force
                 this.getRigidBody().applyCentralImpulse(new Vector3(this.getRelativeZ()).scl(driftBoost));
                 this.driftBoost = 0f;
@@ -181,15 +184,18 @@ public class EntityCar extends Entity {
 
         world.getDynamicsWorld().rayTest(this.getPosition(), down, this.rayResultCallback);
 
+        float altitude = this.desiredAltitude + 200;
         if (this.rayResultCallback.hasHit()) {
             Vector3 point = new Vector3();
             this.rayResultCallback.getHitPointWorld(point);
-            float altitude = this.getPosition().y - point.y;
-
-            Vector3 linearVelocity = this.getRigidBody().getLinearVelocity();
-            linearVelocity.y = (this.desiredAltitude - altitude) / 2f;
-            this.getRigidBody().setLinearVelocity(linearVelocity);
+            altitude = this.getPosition().y - point.y;
+        } else {
+            this.getRigidBody().applyTorque(new Vector3(-10f, 0f, 0f));
         }
+
+        Vector3 linearVelocity = this.getRigidBody().getLinearVelocity();
+        linearVelocity.y = (this.desiredAltitude - altitude);
+        this.getRigidBody().setLinearVelocity(linearVelocity);
     }
 
     /**
@@ -198,7 +204,6 @@ public class EntityCar extends Entity {
     private void recenterOrientation() {
         float pitch = this.getRotationQuaternion().getPitchRad();
         float roll = this.getRotationQuaternion().getRollRad();
-
 
         Vector3 angularVelocity = this.getRigidBody().getAngularVelocity();
         // TODO: retune; this systems feedback is unstable
@@ -211,21 +216,35 @@ public class EntityCar extends Entity {
         this.getRigidBody().setAngularVelocity(angularVelocity);
     }
 
-    public boolean testIfPassedGoal(Track track) {
+    public boolean isRecentering() {
+        float pitch = this.getRotationQuaternion().getPitchRad();
+        float roll = this.getRotationQuaternion().getRollRad();
+
+        return Math.abs(pitch) > this.resetThreshold || Math.abs(pitch) > this.resetThreshold;
+    }
+
+    /**
+     * Tests if the car passed through the goal.
+     * @param track the track
+     * @return -1 if passing backwards, 0 if no passing was made, 1 if passing through
+     */
+    public int testIfPassedGoal(Track track) {
         Vector3 startingPosition = track.getStartingPosition();
         float distanceSquaredToStart = startingPosition.dst2(this.getPosition());
         Vector3 difference = new Vector3(this.getPosition()).sub(startingPosition);
         float newDotStartingPosition = difference.dot(track.getTrackMesh().getTrackHeightmap().getTrackCreator().getLapDirection());
+
+        int returnValue = 0;
         if (distanceSquaredToStart <= track.getAccceptableDistanceSquaredToGoal()) {
-            if (this.dotWithStartingPosition < 0f && newDotStartingPosition > 0f) {
-                Director.log("Passed through goal");
-            } else if (this.dotWithStartingPosition > 0f && newDotStartingPosition < 0f) {
-                Director.log("Went backwards through goal");
+            if (this.dotWithStartingPosition < 0f && newDotStartingPosition >= 0f) {
+                returnValue = 1;
+            } else if (this.dotWithStartingPosition > 0f && newDotStartingPosition <= 0f) {
+                returnValue = -1;
             }
         }
         this.dotWithStartingPosition = newDotStartingPosition;
 
-        return false;
+        return returnValue;
     }
 
     @Override

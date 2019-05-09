@@ -3,12 +3,14 @@ package com.jajebr.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.physics.bullet.Bullet;
 import com.jajebr.game.engine.Constants;
 import com.jajebr.game.engine.Director;
 import com.jajebr.game.engine.screen.Screen;
 import com.jajebr.game.game.Content;
+import com.jajebr.game.game.player.PlayerInputController;
 import com.jajebr.game.game.screen.LoadingScreen;
 
 public class RacingGame extends ApplicationAdapter {
@@ -21,6 +23,10 @@ public class RacingGame extends ApplicationAdapter {
 
 		dtTimer = 0.0f;
 		Director.changeScreen(new LoadingScreen());
+
+		Director.setPlayerInputController(new PlayerInputController());
+		Controllers.addListener(Director.getPlayerInputController());
+		Gdx.input.setInputProcessor(Director.getPlayerInputController());
 	}
 
 	@Override

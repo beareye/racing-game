@@ -3,6 +3,7 @@ package com.jajebr.game.game.world.track;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.jajebr.game.engine.Director;
 
 /**
  * Height map operations to create a track.
@@ -10,6 +11,10 @@ import com.badlogic.gdx.math.Vector3;
 public class TrackCreator {
     private TrackHeightmap trackHeightmap;
     private TrackTexture trackTexture;
+
+    private float randomSinFactor;
+    private float randomCosFactor;
+    private float randomHillFactor;
 
     private Vector2 startingPosition;
     private Vector3 lapDirection;
@@ -42,6 +47,10 @@ public class TrackCreator {
         }
         this.startingPosition = new Vector2();
         this.lapDirection = new Vector3();
+
+        this.randomSinFactor = MathUtils.random(1, 5);
+        this.randomCosFactor = MathUtils.random(1f, 5f);
+        this.randomHillFactor = MathUtils.random(0.25f, 5f);
     }
 
     /**
@@ -51,7 +60,8 @@ public class TrackCreator {
         // Create the hills of the track
         for (int y = 0; y < trackHeightmap.getHeight(); y++) {
             for (int x = 0; x < trackHeightmap.getWidth(); x++) {
-                float longHill = MathUtils.cos( 0.6f * x) * 0.15f + MathUtils.sin(0.4f * y) * 0.15f + 0.6f;
+                float longHill = MathUtils.cos( 0.6f * x * this.randomHillFactor) * 0.15f
+                        + MathUtils.sin(0.4f * y * this.randomHillFactor) * 0.15f + 0.8f;
                 trackHeightmap.setInvalidHeight(x, y, longHill);
                 trackHeightmap.setTexture(x, y, this.trackTexture);
             }
@@ -59,7 +69,7 @@ public class TrackCreator {
 
         // Create the track as a polar equation.
         float thetaStep = 1f;
-        float amplitude = ((this.trackHeightmap.getWidth() / 2f) - 1) / 3f;
+        float amplitude = ((this.trackHeightmap.getWidth() / 2f) - 1) / 3.2f;
 
         int centerX = this.trackHeightmap.getWidth() / 2;
         int centerY = this.trackHeightmap.getHeight() / 2;
@@ -72,21 +82,24 @@ public class TrackCreator {
             int finalX = (int) x + centerX;
             int finalY = (int) y + centerY;
 
-            this.plotWithDiameter(TrackTexture.ROAD, finalX, finalY, 2, 0.1f);
+            this.plotWithDiameter(TrackTexture.ROAD, finalX, finalY, 2, 0.2f + MathUtils.cosDeg(0.01f * theta) * 0.1f);
         }
 
         // Get a random starting position.
         assignStartingPositionAndDirection(centerX, centerY, amplitude);
-
-        // Plot the checkerboard
-        this.plotWithDiameter(TrackTexture.CHECKERBOARD, (int) startingPosition.x, (int) startingPosition.y, 1, 0.1f);
     }
 
     private void assignStartingPositionAndDirection(int centerX, int centerY, float amplitude) {
-        float theta = MathUtils.random(0f, 360f);
-        float r = this.evaluatePolarEquation(theta);
-        this.startingPosition.set(this.getPositionFromR(r, theta, centerX, centerY, amplitude));
-        this.createLapDirection(theta, centerX, centerY, amplitude);
+        float theta = 0f;
+        while (this.lapDirection.isZero()) {
+            theta = MathUtils.random(0f, 360f);
+            float r = this.evaluatePolarEquation(theta);
+            this.startingPosition.set(this.getPositionFromR(r, theta, centerX, centerY, amplitude));
+            this.createLapDirection(theta, centerX, centerY, amplitude);
+        }
+
+        // Plot the checkerboard
+        this.plotWithDiameter(TrackTexture.CHECKERBOARD, (int) startingPosition.x, (int) startingPosition.y, 2, 0.2f + MathUtils.cosDeg(0.01f * theta) * 0.1f);
     }
 
     private Vector2 getPositionFromR(float r, float theta, int centerX, int centerY, float amplitude) {
@@ -99,7 +112,7 @@ public class TrackCreator {
     }
 
     private void createLapDirection(float theta, int centerX, int centerY, float amplitude) {
-        float nextTheta = (theta + 1) % 360f;
+        float nextTheta = (theta + 1) % 360;
         float r = this.evaluatePolarEquation(theta);
         float rNext = this.evaluatePolarEquation(nextTheta);
 
@@ -113,7 +126,7 @@ public class TrackCreator {
     }
 
     private float evaluatePolarEquation(float theta) {
-        return 2 - MathUtils.cosDeg(theta) * MathUtils.sinDeg(3f * theta);
+        return 2 - MathUtils.cosDeg(this.randomCosFactor * theta) * MathUtils.sinDeg(this.randomSinFactor * theta);
     }
 
     private void plotWithDiameter(TrackTexture texture, int x, int y, int diameter, float height) {

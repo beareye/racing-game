@@ -184,7 +184,9 @@ public class TrackMesh implements RenderableProvider {
         Vector3 diff1 = new Vector3(point2).sub(point1);
         Vector3 diff2 = new Vector3(point3).sub(point1);
 
-        return diff1.crs(diff2).nor();
+        Vector3 normal = diff1.crs(diff2).nor();
+
+        return normal;
     }
 
     private int addVertex(int counter, Vector3 vertex, Vector3 normal, Vector2 uv) {

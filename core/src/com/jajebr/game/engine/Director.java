@@ -2,6 +2,7 @@ package com.jajebr.game.engine;
 
 import com.badlogic.gdx.Gdx;
 import com.jajebr.game.engine.screen.Screen;
+import com.jajebr.game.game.player.PlayerInputController;
 
 /**
  * A director contains globals for the game, such as the screen.
@@ -13,17 +14,24 @@ public class Director {
 
     private static Screen currentScreen;
     private static Screen nextScreen;
+    private static PlayerInputController playerInputController;
 
     public static Screen getCurrentScreen() {
         return currentScreen;
     }
-
     public static Screen getNextScreen() {
         return nextScreen;
+    }
+    public static PlayerInputController getPlayerInputController() {
+        return playerInputController;
     }
 
     public static void changeScreen(Screen newScreen) {
         nextScreen = newScreen;
+    }
+
+    public static void setPlayerInputController(PlayerInputController newPlayerInputController) {
+        playerInputController = newPlayerInputController;
     }
 
     public static void changeScreens() {

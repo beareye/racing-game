@@ -36,7 +36,7 @@ public class Skybox extends ModelInstance {
     }
 
     public Skybox() {
-        this(Color.SKY, 250f);
+        this(Color.SKY, 1000f);
     }
 
     public Skybox(boolean nighttime) {

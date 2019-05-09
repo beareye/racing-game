@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.Color;
 
 public enum TrackTexture {
     NONE(0, new Color(0f, 0f, 0f, 0f)),
-    ROAD(1, Color.GRAY),
-    SAND(2, Color.YELLOW),
-    GRASS(3, Color.GREEN),
+    ROAD(1, new Color(0x58555BFF)),
+    SAND(2, new Color(0xF8E0BAFF)),
+    GRASS(3, new Color(0x499A1FFF)),
     CHECKERBOARD(4, Color.WHITE);
 
     private int value;

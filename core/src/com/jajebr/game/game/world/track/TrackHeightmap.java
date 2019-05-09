@@ -84,7 +84,7 @@ public class TrackHeightmap {
         height = 64;
         minHeight = 0f;
         maxHeight = 1f;
-        scaling = new Vector3(100f, 500f, 100f);
+        scaling = new Vector3(200f, 500f, 200f);
         trackCreator = new TrackCreator(this);
 
         createHeightmap();
@@ -93,8 +93,12 @@ public class TrackHeightmap {
 
     public void createHeightmap() {
         heightmap = new float[width * height];
-        textures = new TrackTexture[width * height];
         valid = new boolean[width * height];
+
+        textures = new TrackTexture[width * height];
+        for (int i = 0; i < textures.length; i++) {
+            textures[i] = TrackTexture.NONE;
+        }
 
         this.trackCreator.create();
 
