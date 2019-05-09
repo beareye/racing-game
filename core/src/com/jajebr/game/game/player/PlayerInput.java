@@ -7,6 +7,7 @@ import com.jajebr.game.engine.Director;
 
 public class PlayerInput {
     private Player player;
+    private String name;
 
     public float leftRight;
     public boolean accelerate;
@@ -16,8 +17,17 @@ public class PlayerInput {
 
     public float leftRightThreshold;
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String newName) {
+        this.name = newName;
+    }
+
     public PlayerInput(Player newPlayer) {
         this.player = newPlayer;
+        this.name = "";
         leftRight = 0f;
         leftRightThreshold = 0.1f;
     }

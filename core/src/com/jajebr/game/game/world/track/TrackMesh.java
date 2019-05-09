@@ -149,6 +149,16 @@ public class TrackMesh implements RenderableProvider {
         return vertex;
     }
 
+    public void getCoordinatesFromVertex(Vector2 currentPosition, Vector3 vertex) {
+        float mWidth = this.getTrackHeightmap().getWidth() - 1;
+        float mHeight = this.getTrackHeightmap().getHeight() - 1;
+
+        currentPosition.set(
+                (vertex.x / this.getTrackHeightmap().getScaling().x) + (mWidth / 2f),
+                (vertex.z / this.getTrackHeightmap().getScaling().z) + (mHeight / 2f)
+        );
+    }
+
     private Vector2 getTextureUV(TrackTexture texture, boolean top, boolean left, int x, int y) {
         Rectangle rectangle = Content.getMaterialTextureUV(texture);
         float u = rectangle.x;

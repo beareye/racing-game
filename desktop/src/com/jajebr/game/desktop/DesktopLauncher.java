@@ -7,6 +7,7 @@ import com.jajebr.game.RacingGame;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.vSyncEnabled = false;
 		new LwjglApplication(new RacingGame(), config);
 	}
 }

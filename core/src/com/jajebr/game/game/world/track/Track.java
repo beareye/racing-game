@@ -20,6 +20,7 @@ public class Track {
     private World world;
     private Pixmap pixmap;
     private Texture pixmapTexture;
+    private int amountOfLaps;
 
     private float accceptableDistanceSquaredToGoal;
 
@@ -69,6 +70,10 @@ public class Track {
         return this.accceptableDistanceSquaredToGoal;
     }
 
+    public int getAmountOfLaps() {
+        return this.amountOfLaps;
+    }
+
     /**
      * Initializes an empty track.
      * @param newName the name of the track
@@ -78,13 +83,15 @@ public class Track {
         this.trackMesh = new TrackMesh();
         this.world = newWorld;
 
-        accceptableDistanceSquaredToGoal = this.trackMesh.getTrackHeightmap().getScaling().x * this.trackMesh.getTrackHeightmap().getScaling().z * 30;
+        accceptableDistanceSquaredToGoal = this.trackMesh.getTrackHeightmap().getScaling().x * this.trackMesh.getTrackHeightmap().getScaling().z * 100;
 
         this.startingPosition = new Vector3();
         this.assignStartingPosition();
 
         this.pixmap = this.createPixmap();
         this.pixmapTexture = new Texture(this.pixmap);
+
+        this.amountOfLaps = 3;
     }
 
     private void assignStartingPosition() {

@@ -49,6 +49,8 @@ public class PlayerInputController implements ControllerListener, InputProcessor
     public void reset() {
         controllerPlayerMap.clear();
         availableControllers.clear();
+        useKeyboard = false;
+        keyboardPlayer = null;
     }
 
     public void startListening() {
@@ -63,9 +65,7 @@ public class PlayerInputController implements ControllerListener, InputProcessor
         ObjectSet.ObjectSetIterator<Controller> it = availableControllers.iterator();
         if (it.hasNext()) {
             Controller controller = it.next();
-
-            Director.log("Assigned controller " + controller + " to player " + player.getID());
-
+            player.getPlayerInput().setName(controller.getName());
             controllerPlayerMap.put(controller, player);
             it.remove();
             return;

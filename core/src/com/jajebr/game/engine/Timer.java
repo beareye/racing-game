@@ -4,6 +4,10 @@ public class Timer {
     private boolean active;
     private float dtTimer;
 
+    public boolean isActive() {
+        return active;
+    }
+
     public float getTimeElapsed() {
         return this.dtTimer;
     }

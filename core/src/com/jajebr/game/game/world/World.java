@@ -2,8 +2,6 @@ package com.jajebr.game.game.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
@@ -24,10 +22,8 @@ import com.jajebr.game.engine.Constants;
 import com.jajebr.game.engine.Director;
 import com.jajebr.game.game.Content;
 import com.jajebr.game.game.entity.Entity;
-import com.jajebr.game.game.entity.EntityCar;
+import com.jajebr.game.game.player.Player;
 import com.jajebr.game.game.world.track.Track;
-
-import java.util.Iterator;
 
 /**
  * The game world.
@@ -39,6 +35,7 @@ public class World {
     private Track track;
     private Skybox skybox;
     private boolean nighttime;
+    private Array<Player> rankings;
 
     private Array<Entity> entities;
 
@@ -92,6 +89,10 @@ public class World {
         return dynamicsWorld;
     }
 
+    public Array<Player> getRankings() {
+        return rankings;
+    }
+
     public World() {
         gravity = 9.8f;
         dragCoefficient = 0.5f;
@@ -126,6 +127,8 @@ public class World {
         worldContactListener = new WorldContactListener(this);
 
         addTrackBody();
+
+        this.rankings = new Array<Player>();
     }
 
     /**
@@ -194,6 +197,14 @@ public class World {
                 dynamicsWorld.debugDrawWorld();
             debugDrawer.end();
         }
+    }
+
+    public int assignRankingToPlayer(Player player) {
+        if (!this.rankings.contains(player, true)) {
+            this.rankings.add(player);
+            return this.rankings.size;
+        }
+        return -1;
     }
 
     /**
