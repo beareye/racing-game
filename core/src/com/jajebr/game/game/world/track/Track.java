@@ -101,6 +101,12 @@ public class Track {
         this.startingPosition.set(worldStarting);
     }
 
+    public Vector3 getStartingPositionFrom2DCoordinates(Vector2 coordinates) {
+        Vector3 worldStarting = this.trackMesh.getVertex((int) coordinates.x, (int) coordinates.y);
+        worldStarting.add(0f, 10f, 0f);
+        return worldStarting;
+    }
+
     private Pixmap createPixmap() {
         int width = this.getTrackHeightmap().getWidth();
         int height = this.getTrackHeightmap().getHeight();

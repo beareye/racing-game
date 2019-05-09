@@ -162,8 +162,10 @@ public class PlayerHUD {
         spriteBatch.setColor(Color.WHITE);
         spriteBatch.draw(
                 pixmapTexture,
-                this.view.x + this.view.width - pixmapTexture.getWidth(),
-                this.view.y + this.view.height - pixmapTexture.getHeight()
+                this.view.x + this.view.width - pixmapTexture.getWidth() * 1.5f,
+                this.view.y + this.view.height - pixmapTexture.getHeight() * 1.5f,
+                pixmapTexture.getWidth() * 1.5f,
+                pixmapTexture.getHeight() * 1.5f
         );
 
         // Can't use iterator for nested loops.
@@ -179,10 +181,10 @@ public class PlayerHUD {
 
             spriteBatch.draw(
                     Content.white,
-                    this.view.x + this.view.width - pixmapTexture.getWidth() + minimapPosition.x - 2,
-                    this.view.y + this.view.height - minimapPosition.y - 2,
-                    4,
-                    4
+                    this.view.x + this.view.width - pixmapTexture.getWidth() * 1.5f + minimapPosition.x * 1.5f - 3.5f,
+                    this.view.y + this.view.height - minimapPosition.y * 1.5f - 3.5f,
+                    7,
+                    7
             );
         }
     }

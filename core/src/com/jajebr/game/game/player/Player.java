@@ -1,10 +1,14 @@
 package com.jajebr.game.game.player;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.environment.PointLight;
+import com.badlogic.gdx.graphics.g3d.environment.SpotLight;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
@@ -130,6 +134,7 @@ public class Player {
         this.car.setActive(false);
         this.elapsedTimer.deactivate();
         this.rank = this.world.assignRankingToPlayer(this);
+        this.world.addFinishedPlayer(this);
     }
 
     public void update(float dt) {
@@ -144,9 +149,10 @@ public class Player {
             this.lapCount = 0;
         }
 
-        if (this.car.getPosition().y < -300f) {
+        if (this.car.isActive() && this.car.getPosition().y < -300f) {
             this.retired = true;
             this.car.setActive(false);
+            this.world.addFinishedPlayer(this);
         }
 
         int lapsPassed = car.testIfPassedGoal(world.getTrack());
@@ -199,7 +205,9 @@ public class Player {
     }
 
     private void assignCarToStartingPosition() {
-        Vector3 startingPosition = this.world.getTrack().getStartingPosition();
+        //Vector3 startingPosition = this.world.getTrack().getStartingPosition();
+        Vector2 startingCoords = this.world.getTrack().getTrackHeightmap().getTrackCreator().getStartingPosition(id);
+        Vector3 startingPosition = this.world.getTrack().getStartingPositionFrom2DCoordinates(startingCoords);
         Vector3 lapDirection = this.world.getTrack().getTrackMesh().getTrackHeightmap().getTrackCreator().getLapDirection();
 
         Vector3 newPosition = new Vector3(lapDirection).scl(-10f).add(startingPosition);

@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.jajebr.game.engine.Constants;
@@ -36,13 +37,12 @@ public class MainGameScreen extends Screen {
         spriteBatch = new SpriteBatch();
 
         world = new World();
-        world.getEnvironment().add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -1.0f, -0.8f, 0.2f));
-        world.getEnvironment().add(new PointLight().set(0.4f, 0.8f, 0.4f, 100f, 100f, 100f, 100f));
 
         this.players = new Array<Player>();
         for (int i = 0; i < numPlayers; i++) {
             Player player = new Player(i, numPlayers, this.world);
             players.add(player);
+            world.getEnvironment().add(player.getPlayerLight());
             Director.getPlayerInputController().assignControllerToPlayer(player);
         }
 
@@ -56,7 +56,7 @@ public class MainGameScreen extends Screen {
         }
         world.update(dt);
 
-        if (world.getRankings().size >= players.size) {
+        if (world.finished(players.size)) {
             this.fadeOutTimer.update(dt);
 
             if (this.fadeOutTimer.getTimeElapsed() > 10f) {

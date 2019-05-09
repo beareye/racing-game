@@ -2,10 +2,12 @@ package com.jajebr.game.game.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.DebugDrawer;
@@ -18,10 +20,13 @@ import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
 import com.badlogic.gdx.physics.bullet.linearmath.btIDebugDraw;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.jajebr.game.engine.Constants;
 import com.jajebr.game.engine.Director;
+import com.jajebr.game.engine.Timer;
 import com.jajebr.game.game.Content;
 import com.jajebr.game.game.entity.Entity;
+import com.jajebr.game.game.entity.EntityCar;
 import com.jajebr.game.game.player.Player;
 import com.jajebr.game.game.world.track.Track;
 
@@ -36,6 +41,7 @@ public class World {
     private Skybox skybox;
     private boolean nighttime;
     private Array<Player> rankings;
+    private ObjectSet<Player> finishedPlayers;
 
     private Array<Entity> entities;
 
@@ -48,6 +54,10 @@ public class World {
     private btDiscreteDynamicsWorld dynamicsWorld;
 
     private DebugDrawer debugDrawer;
+
+    private DirectionalLight sun;
+    private Timer sunTimer;
+    private float sunTime;
 
     /**
      * Returns the gravity of the world.
@@ -124,11 +134,26 @@ public class World {
         debugDrawer.setDebugMode(btIDebugDraw.DebugDrawModes.DBG_MAX_DEBUG_DRAW_MODE);
         dynamicsWorld.setDebugDrawer(debugDrawer);
 
+        this.sun = new DirectionalLight();
+        this.sun.setColor(Color.WHITE);
+        this.sunTimer = new Timer(true);
+        this.environment.add(this.sun);
+        this.sunTime = 10f;
+
         worldContactListener = new WorldContactListener(this);
 
         addTrackBody();
 
         this.rankings = new Array<Player>();
+        this.finishedPlayers = new ObjectSet<Player>();
+    }
+
+    public void addFinishedPlayer(Player player) {
+        this.finishedPlayers.add(player);
+    }
+
+    public boolean finished(int numPlayers) {
+        return this.finishedPlayers.size == numPlayers;
     }
 
     /**
@@ -172,6 +197,14 @@ public class World {
         for (Entity entity : entities) {
             entity.update(dt);
         }
+
+        sunTimer.update(dt);
+
+        sun.setDirection(
+                MathUtils.cos(sunTimer.getTimeElapsed() / sunTime),
+                -1f,
+                MathUtils.sin(sunTimer.getTimeElapsed() / sunTime)
+        );
 
         dynamicsWorld.stepSimulation(dt, Constants.PHYSICS_MAX_SUBSTEP, Constants.PHYSICS_TIMESTEP);
     }
