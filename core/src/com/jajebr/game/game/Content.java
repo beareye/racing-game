@@ -28,6 +28,8 @@ public class Content {
 
     public static Model formulaStar;
     public static Model inwardCube;
+    public static Model tree;
+    public static Model rock;
     public static Texture materials;
     public static Texture white;
     public static BitmapFont normalFont;
@@ -37,9 +39,10 @@ public class Content {
     public static void init() {
         assetManager.load("models/formulastar/formulastar.obj", Model.class);
         assetManager.load("models/inwardCube/inwardCube.obj", Model.class);
+        assetManager.load("models/tree/CartoonTree.obj", Model.class);
         assetManager.load("textures/materials.png", Texture.class);
         assetManager.load("textures/white.png", Texture.class);
-
+        assetManager.load("models/rock/Rock1.obj", Model.class);
         Content.createFonts();
 
         ModelBuilder modelBuilder = new ModelBuilder();
@@ -65,6 +68,9 @@ public class Content {
         inwardCube = assetManager.get("models/inwardCube/inwardCube.obj", Model.class);
         materials = assetManager.get("textures/materials.png", Texture.class);
         white = assetManager.get("textures/white.png", Texture.class);
+        tree = assetManager.get("models/tree/CartoonTree.obj", Model.class);
+        rock = assetManager.get("models/rock/Rock1.obj", Model.class);
+
     }
 
     public static Rectangle getMaterialTexture(TrackTexture trackTexture) {

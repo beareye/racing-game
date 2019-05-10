@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.DebugDrawer;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionConfiguration;
@@ -28,11 +30,15 @@ import com.jajebr.game.game.entity.EntityCar;
 import com.jajebr.game.game.world.track.Track;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The game world.
  */
 public class World {
+    public final static int NUM_TREES = 2000;
+    public final static int NUM_ROCKS = 2000;
     private float gravity;
     private float dragCoefficient;
     private Environment environment;
@@ -41,6 +47,8 @@ public class World {
     private boolean nighttime;
 
     private Array<Entity> entities;
+
+    private List<ModelInstance> foliage;
 
     private WorldContactListener worldContactListener;
 
@@ -97,7 +105,7 @@ public class World {
         dragCoefficient = 0.5f;
         track = new Track(this, "test track");
         nighttime = MathUtils.randomBoolean();
-
+        foliage = new LinkedList<ModelInstance>();
         entities = new Array<Entity>();
 
         // Basic lights
@@ -126,6 +134,41 @@ public class World {
         worldContactListener = new WorldContactListener(this);
 
         addTrackBody();
+
+
+    }
+    private void loadRocks(ModelBatch batch, int number) {
+        for (int i = 0; i < number; i++) {
+            float x = MathUtils.random() * (this.getTrack().getTrackHeightmap().getWidth() - 1);
+            float y = MathUtils.random() * (this.getTrack().getTrackHeightmap().getHeight() - 1);
+            Vector3 location = this.getTrack().getTrackMesh().getVertex(x, y);
+
+            if (location.y < -100 && MathUtils.random(0, 10) < 8) {
+                i--;
+                continue;
+            }
+            Matrix4 transform = new Matrix4(new Vector3(location.x, location.y - 5, location.z), new Quaternion(), new Vector3(5 * MathUtils.random() + 5, 5 * MathUtils.random() + 5, 5 * MathUtils.random() + 5));
+            ModelInstance m = new ModelInstance(Content.rock, transform);
+            batch.render(m);
+            foliage.add(m);
+        }
+    }
+
+    private void loadTrees(ModelBatch batch, int number) {
+        for (int i = 0; i < number; i++) {
+            float x = MathUtils.random() * (this.getTrack().getTrackHeightmap().getWidth() - 1);
+            float y = MathUtils.random() * (this.getTrack().getTrackHeightmap().getHeight() - 1);
+            Vector3 location = this.getTrack().getTrackMesh().getVertex(x, y);
+            if (location.y < -100) {
+                i--;
+                continue;
+            }
+            Matrix4 transform = new Matrix4(new Vector3(location.x, location.y, location.z), new Quaternion(), new Vector3(20, 20 * MathUtils.random() + 10, 20));
+            ModelInstance m = new ModelInstance(Content.tree, transform);
+            batch.render(m);
+            foliage.add(m);
+        }
+
     }
 
     /**
@@ -193,6 +236,15 @@ public class World {
             debugDrawer.begin(modelBatch.getCamera());
                 dynamicsWorld.debugDrawWorld();
             debugDrawer.end();
+        }
+
+        if (foliage.isEmpty()) {
+            loadTrees(modelBatch, NUM_TREES);
+            loadRocks(modelBatch, NUM_ROCKS);
+        } else {
+            for (ModelInstance model: foliage) {
+                modelBatch.render(model);
+            }
         }
     }
 
