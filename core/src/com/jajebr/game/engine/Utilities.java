@@ -1,7 +1,9 @@
 package com.jajebr.game.engine;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.jajebr.game.game.Content;
 
 public class Utilities {
     /**
@@ -45,10 +47,40 @@ public class Utilities {
         return true;
     }
 
+    /**
+     * Returns a color derived from the hashcode.
+     * @param object the object
+     * @return the derived color
+     */
     public static Color getColorFromHashcode(Object object) {
         int hashCode = object.hashCode();
         int colorBits = hashCode % 0xFFFFFF;
         int finalColorBits = (colorBits << 8) | 0xFF;
         return new Color(finalColorBits);
+    }
+
+    public static String rankToString(int rank) {
+        if (rank % 10 == 1) {
+            return rank + "st";
+        } else if (rank % 10 == 2) {
+            return rank + "nd";
+        } else if (rank % 10 == 3) {
+            return rank + "rd";
+        } else {
+            return rank + "th";
+        }
+    }
+
+    public static Color getRankColor(int rank) {
+        switch(rank) {
+            case 1:
+                return Color.GOLD;
+            case 2:
+                return Color.LIGHT_GRAY;
+            case 3:
+                return Color.BROWN;
+            default:
+                return Color.GREEN;
+        }
     }
 }

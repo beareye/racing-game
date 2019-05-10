@@ -34,6 +34,7 @@ public class ControllerAssignScreen extends Screen {
         glyphLayout = new GlyphLayout();
         flashTimer = new Timer(true);
 
+        Director.getPlayerInputController().reset();
         Director.getPlayerInputController().startListening();
     }
 
@@ -76,6 +77,17 @@ public class ControllerAssignScreen extends Screen {
                         "Keyboard",
                         Gdx.graphics.getWidth() / 2f - glyphLayout.width / 2f,
                         y
+                );
+            }
+
+            if (Director.getPlayerInputController().getNumPlayers() > 0) {
+                glyphLayout.setText(Content.normalFont, "PRESS ENTER TO START");
+                Content.normalFont.setColor(Color.GOLD);
+                Content.normalFont.draw(
+                        spriteBatch,
+                        "PRESS ENTER TO START",
+                        Gdx.graphics.getWidth() / 2f - glyphLayout.width / 2f,
+                        133
                 );
             }
 

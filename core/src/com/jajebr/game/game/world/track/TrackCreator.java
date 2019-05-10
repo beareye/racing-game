@@ -19,6 +19,8 @@ public class TrackCreator {
     private Vector2 startingPosition;
     private Vector3 lapDirection;
 
+    private float startingTheta;
+
     /**
      * Returns the starting position for the car in heightmap coordinates.
      * @return the starting position for the car
@@ -46,6 +48,7 @@ public class TrackCreator {
             this.trackTexture = TrackTexture.GRASS;
         }
         this.startingPosition = new Vector2();
+        this.startingTheta = 0f;
         this.lapDirection = new Vector3();
 
         this.randomSinFactor = MathUtils.random(1, 5);
@@ -82,11 +85,20 @@ public class TrackCreator {
             int finalX = (int) x + centerX;
             int finalY = (int) y + centerY;
 
-            this.plotWithDiameter(TrackTexture.ROAD, finalX, finalY, 2, 0.2f + MathUtils.cosDeg(0.01f * theta) * 0.1f);
+            this.plotWithDiameter(TrackTexture.ROAD, finalX, finalY, 2, 0.2f + MathUtils.cosDeg(0.1f * theta) * 0.1f);
         }
 
         // Get a random starting position.
         assignStartingPositionAndDirection(centerX, centerY, amplitude);
+    }
+    public Vector2 getStartingPosition(int playerID) {
+        int centerX = this.trackHeightmap.getWidth() / 2;
+        int centerY = this.trackHeightmap.getHeight() / 2;
+        float amplitude = ((this.trackHeightmap.getWidth() / 2f) - 1) / 3.2f;
+
+        float playerTheta = this.startingTheta - (playerID * 2);
+        float r = this.evaluatePolarEquation(playerTheta);
+        return this.getPositionFromR(r, playerTheta, centerX, centerY, amplitude);
     }
 
     private void assignStartingPositionAndDirection(int centerX, int centerY, float amplitude) {
@@ -97,6 +109,8 @@ public class TrackCreator {
             this.startingPosition.set(this.getPositionFromR(r, theta, centerX, centerY, amplitude));
             this.createLapDirection(theta, centerX, centerY, amplitude);
         }
+
+        this.startingTheta = theta;
 
         // Plot the checkerboard
         this.plotWithDiameter(TrackTexture.CHECKERBOARD, (int) startingPosition.x, (int) startingPosition.y, 2, 0.2f + MathUtils.cosDeg(0.01f * theta) * 0.1f);

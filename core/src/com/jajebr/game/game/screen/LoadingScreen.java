@@ -3,17 +3,21 @@ package com.jajebr.game.game.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Matrix4;
 import com.jajebr.game.engine.Director;
 import com.jajebr.game.engine.screen.Screen;
 import com.jajebr.game.game.Content;
 
 public class LoadingScreen extends Screen {
-    SpriteBatch spriteBatch;
-    GlyphLayout glyphLayout;
+    private SpriteBatch spriteBatch;
+    private Matrix4 transform;
+    private GlyphLayout glyphLayout;
+
     public LoadingScreen() {
         Content.init();
         spriteBatch = new SpriteBatch();
-        spriteBatch.getTransformMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        transform = new Matrix4();
+        transform.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         glyphLayout = new GlyphLayout();
     }
 
@@ -28,6 +32,7 @@ public class LoadingScreen extends Screen {
 
     @Override
     public void draw(float alpha) {
+        spriteBatch.setProjectionMatrix(transform);
         spriteBatch.begin();
         glyphLayout.setText(Content.normalFont, "LOADING");
         Content.normalFont.draw(

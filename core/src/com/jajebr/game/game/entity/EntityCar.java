@@ -44,6 +44,15 @@ public class EntityCar extends Entity {
     private ClosestRayResultCallback rayResultCallback;
 
     private PlayerInput input;
+    private boolean active;
+
+    public void setActive(boolean status) {
+        active = status;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
 
     public EntityCar(World world, PlayerInput playerInput) {
         super(world, Content.formulaStar, 1000f);
@@ -68,10 +77,11 @@ public class EntityCar extends Entity {
         this.extraRotation = new Quaternion();
         this.extraRotationReverse = new Quaternion();
         this.drifting = false;
-        this.maxDriftBoost = 800000f;
+        this.maxDriftBoost = 700000f;
         this.driftBoost = 0f;
         this.driftScale = 100000f;
         this.dotWithStartingPosition = Float.NEGATIVE_INFINITY;
+        this.active = false;
 
         this.rayResultCallback = new ClosestRayResultCallback(Vector3.Zero, Vector3.Y);
 
@@ -84,6 +94,10 @@ public class EntityCar extends Entity {
     @Override
     public void update(float dt) {
         super.update(dt);
+
+        if (!active) {
+            return;
+        }
 
         if (this.input.accelerate) {
             this.applyForce(this.getRelativeZ().cpy().scl(thrustForce));
@@ -220,7 +234,7 @@ public class EntityCar extends Entity {
         float pitch = this.getRotationQuaternion().getPitchRad();
         float roll = this.getRotationQuaternion().getRollRad();
 
-        return Math.abs(pitch) > this.resetThreshold || Math.abs(pitch) > this.resetThreshold;
+        return Math.abs(pitch) > this.resetThreshold || Math.abs(roll) > this.resetThreshold;
     }
 
     /**
