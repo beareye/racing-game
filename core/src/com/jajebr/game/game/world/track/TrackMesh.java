@@ -128,8 +128,20 @@ public class TrackMesh implements RenderableProvider {
      * @param y the y-coordinate of the heightmap
      * @return a world-space representation
      */
-    public Vector3 getVertex(int x, int y) {
-        float height = this.getTrackHeightmap().getHeightmap()[x + y * this.getTrackHeightmap().getWidth()];
+    public Vector3 getVertex(float x, float y) {
+        //using interpoation to find the height
+        float height;
+        if ((int) x + 1 + (int)(y + 1) * this.getTrackHeightmap().getWidth() >= this.getTrackHeightmap().getHeightmap().length) {
+            height = this.getTrackHeightmap().getHeightmap()[(int) x + (int) y * this.getTrackHeightmap().getWidth()];
+        } else {
+            float height1 = this.getTrackHeightmap().getHeightmap()[(int) x + (int) y * this.getTrackHeightmap().getWidth()];
+            float height2 = this.getTrackHeightmap().getHeightmap()[(int) x + 1 + (int) y * this.getTrackHeightmap().getWidth()];
+            float height3 = this.getTrackHeightmap().getHeightmap()[(int) x + (int)(y + 1) * this.getTrackHeightmap().getWidth()];
+            float height4 = this.getTrackHeightmap().getHeightmap()[(int) x + 1 + (int)(y + 1) * this.getTrackHeightmap().getWidth()];
+            float height5 = (x - (int) x) * height2 + (1 - (x - (int) x)) * height1;
+            float height6 = (x - (int) x) * height4 + (1 - (x - (int) x)) * height3;
+            height = (y - (int) y) * height6 + (1 - (y - (int) y)) * height5;
+        }
 
         float mWidth = this.getTrackHeightmap().getWidth() - 1;
         float mHeight = this.getTrackHeightmap().getHeight() - 1;
