@@ -310,7 +310,7 @@ public class World {
             debugDrawer.end();
         }
 
-        if(!foliage.isEmpty()) {
+        if(!foliage.isEmpty() &&!Director.LOW_DETAIL) {
             bvhNode.renderAll(modelBatch, this);
         }
     }

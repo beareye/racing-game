@@ -59,6 +59,32 @@ public class PlayerInput {
                     break;
             }
         } else {
+            switch (button) {
+                // B
+                case 1:
+                    this.reverse = pressed;
+                    break;
+                // A
+                case 2:
+                    this.accelerate = pressed;
+                    break;
+                // X
+                case 3:
+                    if (pressed) {
+                        this.player.setFirstPerson(!this.player.isFirstPerson());
+                    }
+                    break;
+                // L/L Trigger
+                case 4:
+                case 6:
+                    this.driftingLeft = pressed;
+                    break;
+                // R/R Trigger
+                case 5:
+                case 7:
+                    this.driftingRight = pressed;
+                    break;
+            }
         }
     }
 
@@ -68,6 +94,11 @@ public class PlayerInput {
             if (axis == 3) {
                 this.leftRight = value;
             }
+        } else {
+            if (axis == 3) {
+                this.leftRight = value;
+            }
+            Director.log("Axis " + axis + " value" + value);
         }
     }
 
@@ -104,6 +135,24 @@ public class PlayerInput {
                     this.leftRight = 0f;
                 }
                 break;
+        }
+    }
+
+    public void mobileUpdate(float dt) {
+        float accelX = Gdx.input.getAccelerometerX() / 10;
+        float accelY = Gdx.input.getAccelerometerY() / 10;
+        float accelZ = Gdx.input.getAccelerometerZ() / 10;
+
+        if (Gdx.input.isTouched()) {
+            this.accelerate = true;
+        } else {
+            this.accelerate = false;
+        }
+
+        this.leftRight = accelY;
+        if (accelZ < 0.8) { // Reverse
+            this.reverse = true;
+            this.accelerate = false;
         }
     }
 }

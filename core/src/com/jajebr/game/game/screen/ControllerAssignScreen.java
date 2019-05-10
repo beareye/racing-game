@@ -1,5 +1,6 @@
 package com.jajebr.game.game.screen;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.controllers.Controller;
@@ -47,9 +48,14 @@ public class ControllerAssignScreen extends Screen {
     public void update(float dt) {
         flashTimer.update(dt);
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER) && Director.getPlayerInputController().getNumPlayers() > 0) {
+        int players = Director.getPlayerInputController().getNumPlayers();
+        if (Gdx.app.getType() == Application.ApplicationType.Android) {
+            players += 1;
+        }
+        if (
+                (Gdx.input.isKeyJustPressed(Input.Keys.ENTER) || Gdx.input.isTouched())
+                && players > 0) {
             Director.getPlayerInputController().stopListening();
-            int players = Director.getPlayerInputController().getNumPlayers();
             Director.changeScreen(new MainGameScreen(players));
 
             Content.jackson.stop();

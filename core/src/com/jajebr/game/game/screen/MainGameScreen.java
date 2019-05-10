@@ -1,5 +1,6 @@
 package com.jajebr.game.game.screen;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -54,6 +55,7 @@ public class MainGameScreen extends Screen {
             players.add(player);
             Director.getPlayerInputController().assignControllerToPlayer(player);
         }
+
 
         this.fadeOutTimer = new Timer(true);
         this.elapsedTimer = new Timer(true);
@@ -110,6 +112,10 @@ public class MainGameScreen extends Screen {
                     Content.game.stop();
                 }
             }
+        }
+
+        if (Gdx.app.getType() == Application.ApplicationType.Android) {
+            players.get(0).getPlayerInput().mobileUpdate(dt);
         }
 
         if (Director.DEBUG && Gdx.input.isKeyJustPressed(Input.Keys.F10)) {
