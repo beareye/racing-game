@@ -9,6 +9,7 @@ import com.jajebr.game.game.player.PlayerInputController;
  */
 public class Director {
     public static boolean DEBUG = false;
+    public static boolean LOW_DETAIL = false;
 
     private static boolean fullscreen = false;
 

@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.physics.bullet.DebugDrawer;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionConfiguration;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionDispatcher;
@@ -27,6 +28,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.jajebr.game.engine.Constants;
 import com.jajebr.game.engine.Director;
 import com.jajebr.game.engine.Timer;
+import com.jajebr.game.engine.renderer.BVHNode;
 import com.jajebr.game.game.Content;
 import com.jajebr.game.game.entity.Entity;
 import com.jajebr.game.game.entity.EntityCar;
@@ -54,7 +56,7 @@ public class World {
 
     private Array<Entity> entities;
 
-    private List<ModelInstance> foliage;
+    private Array<ModelInstance> foliage;
 
     private WorldContactListener worldContactListener;
 
@@ -69,6 +71,8 @@ public class World {
     private DirectionalLight sun;
     private Timer sunTimer;
     private float sunTime;
+
+    private BVHNode bvhNode;
 
     /**
      * Returns the gravity of the world.
@@ -123,7 +127,7 @@ public class World {
         dragCoefficient = 0.5f;
         track = new Track(this, "test track");
         nighttime = MathUtils.randomBoolean();
-        foliage = new LinkedList<ModelInstance>();
+        foliage = new Array<ModelInstance>();
         entities = new Array<Entity>();
 
         // Basic lights
@@ -160,8 +164,19 @@ public class World {
         addTrackBody();
         this.rankings = new Array<Player>();
         this.finishedPlayers = new ObjectSet<Player>();
+
+        if (!Director.LOW_DETAIL) {
+            loadTrees(NUM_TREES);
+            loadRocks(NUM_ROCKS);
+            this.createBVHTree();
+        }
     }
-    private void loadRocks(ModelBatch batch, int number) {
+
+    private void createBVHTree() {
+        this.bvhNode = new BVHNode(foliage, 10);
+    }
+
+    private void loadRocks(int number) {
         for (int i = 0; i < number; i++) {
             float x = MathUtils.random() * (this.getTrack().getTrackHeightmap().getWidth() - 1);
             float y = MathUtils.random() * (this.getTrack().getTrackHeightmap().getHeight() - 1);
@@ -173,12 +188,22 @@ public class World {
             }
             Matrix4 transform = new Matrix4(new Vector3(location.x, location.y - 5, location.z), new Quaternion(), new Vector3(5 * MathUtils.random() + 5, 5 * MathUtils.random() + 5, 5 * MathUtils.random() + 5));
             ModelInstance m = new ModelInstance(Content.rock, transform);
-            batch.render(m);
+
+            Vector3 position = new Vector3();
+            transform.getTranslation(position);
+            BoundingBox aabb = new BoundingBox();
+            m.calculateBoundingBox(aabb);
+            aabb.set(
+                    new Vector3(aabb.min).add(position),
+                    new Vector3(aabb.max).add(position)
+            );
+            m.userData = aabb;
+
             foliage.add(m);
         }
     }
 
-    private void loadTrees(ModelBatch batch, int number) {
+    private void loadTrees(int number) {
         for (int i = 0; i < number; i++) {
             float x = MathUtils.random() * (this.getTrack().getTrackHeightmap().getWidth() - 1);
             float y = MathUtils.random() * (this.getTrack().getTrackHeightmap().getHeight() - 1);
@@ -189,7 +214,17 @@ public class World {
             }
             Matrix4 transform = new Matrix4(new Vector3(location.x, location.y, location.z), new Quaternion(), new Vector3(20, 20 * MathUtils.random() + 10, 20));
             ModelInstance m = new ModelInstance(Content.tree, transform);
-            batch.render(m);
+
+            Vector3 position = new Vector3();
+            transform.getTranslation(position);
+            BoundingBox aabb = new BoundingBox();
+            m.calculateBoundingBox(aabb);
+            aabb.set(
+                    new Vector3(aabb.min).add(position),
+                    new Vector3(aabb.max).add(position)
+            );
+            m.userData = aabb;
+
             foliage.add(m);
         }
     }
@@ -275,13 +310,8 @@ public class World {
             debugDrawer.end();
         }
 
-        if (foliage.isEmpty()) {
-            loadTrees(modelBatch, NUM_TREES);
-            loadRocks(modelBatch, NUM_ROCKS);
-        } else {
-            for (ModelInstance model: foliage) {
-                modelBatch.render(model);
-            }
+        if(!foliage.isEmpty()) {
+            bvhNode.renderAll(modelBatch, this);
         }
     }
 

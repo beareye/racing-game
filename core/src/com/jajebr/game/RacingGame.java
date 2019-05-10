@@ -56,6 +56,9 @@ public class RacingGame extends ApplicationAdapter {
 	 * Checks keys for any top-level operations (e.g. fullscreen)
 	 */
 	public void checkKeys() {
+		if (Gdx.input.isKeyJustPressed(Input.Keys.F9)) {
+			Director.LOW_DETAIL = !Director.LOW_DETAIL;
+		}
 		if (Gdx.input.isKeyJustPressed(Input.Keys.F11)) {
 			Director.swapFullscreen();
 			this.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());

@@ -83,7 +83,7 @@ public class Track {
         this.trackMesh = new TrackMesh();
         this.world = newWorld;
 
-        accceptableDistanceSquaredToGoal = this.trackMesh.getTrackHeightmap().getScaling().x * this.trackMesh.getTrackHeightmap().getScaling().z * 100;
+        accceptableDistanceSquaredToGoal = this.trackMesh.getTrackHeightmap().getScaling().x * this.trackMesh.getTrackHeightmap().getScaling().z * 16;
 
         this.startingPosition = new Vector3();
         this.assignStartingPosition();

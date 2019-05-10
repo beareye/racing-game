@@ -109,11 +109,10 @@ public class MainGameScreen extends Screen {
                 } else {
                     Content.game.stop();
                 }
-                Content.thanks.play();
             }
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.F10)) {
+        if (Director.DEBUG && Gdx.input.isKeyJustPressed(Input.Keys.F10)) {
             Director.changeScreen(new HeightMapTestScreen());
         }
     }
