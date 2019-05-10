@@ -220,27 +220,6 @@ public abstract class Entity {
     }
 
     /**
-     * Pulls the camera behind the entity.
-     * TODO: move to a different class
-     * @param cam the camera
-     */
-    public void pullCameraBehind(Camera cam) {
-        Vector3 relativeZ = new Vector3(this.relativeZ);
-        relativeZ.y = 0f;
-        relativeZ.nor();
-
-        float pullback = 150f;
-        float yPullback = 66f;
-        float t = this.getRigidBody().getLinearVelocity().len2() / 10000;
-        t = MathUtils.clamp(t, 0, 1);
-        pullback += Utilities.quadraticEasing(0f, 100f, t);
-        cam.position.set(relativeZ).scl(-pullback).add(this.getPosition());
-        cam.position.add(0f, yPullback, 0f);
-        cam.direction.set(relativeZ);
-        cam.up.set(Vector3.Y);
-    }
-
-    /**
      * Disposes the entity.
      */
     public void dispose() {

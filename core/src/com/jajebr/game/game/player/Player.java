@@ -1,6 +1,7 @@
 package com.jajebr.game.game.player;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -20,6 +21,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.jajebr.game.engine.Constants;
 import com.jajebr.game.engine.Director;
 import com.jajebr.game.engine.Timer;
+import com.jajebr.game.engine.Utilities;
 import com.jajebr.game.game.Content;
 import com.jajebr.game.game.entity.EntityCar;
 import com.jajebr.game.game.world.World;
@@ -50,6 +52,10 @@ public class Player {
     private boolean retired;
 
     private int rank;
+
+    private long hoverID;
+
+    private boolean firstPerson;
 
     /**
      * Returns the ID of the player.
@@ -102,6 +108,14 @@ public class Player {
         return rank;
     }
 
+    public boolean isFirstPerson() {
+        return firstPerson;
+    }
+
+    public void setFirstPerson(boolean person) {
+        this.firstPerson = person;
+    }
+
     public Player(int newId, int numPlayers, World existingWorld) {
         this.id = newId;
         this.playerCount = numPlayers;
@@ -120,6 +134,10 @@ public class Player {
         this.minimapPosition = new Vector2();
         this.rank = -1;
 
+        this.hoverID = -1;
+
+        this.firstPerson = false;
+
         /*
         test = new ModelInstance(Content.boxModel);
         test2 = new ModelInstance(Content.boxModel);
@@ -134,6 +152,12 @@ public class Player {
         this.car.setActive(false);
         this.elapsedTimer.deactivate();
         this.rank = this.world.assignRankingToPlayer(this);
+        if (this.rank == 1) {
+            Content.win.play(1f);
+        } else {
+            Content.finish.play(1f);
+        }
+        Content.hover.stop(hoverID);
         this.world.addFinishedPlayer(this);
     }
 
@@ -147,12 +171,23 @@ public class Player {
             this.lapTimer.activate();
             this.elapsedTimer.activate();
             this.lapCount = 0;
+            hoverID = Content.hover.loop(1f / this.playerCount);
         }
 
-        if (this.car.isActive() && this.car.getPosition().y < -300f) {
-            this.retired = true;
-            this.car.setActive(false);
-            this.world.addFinishedPlayer(this);
+        if (this.car.isActive()) {
+             if(this.car.getPosition().y < -300f) {
+                 this.retired = true;
+                 this.car.setActive(false);
+                 this.world.addFinishedPlayer(this);
+
+                 Content.toobad.play(1);
+             }
+
+             float carSpeed = this.car.getRigidBody().getLinearVelocity().len2();
+             float pitch = MathUtils.clamp(0.5f + 1.5f * carSpeed / (1000 * 1000), 0.5f, 2.0f);
+             float volume = MathUtils.clamp(carSpeed / (1000 * 1000), 0.0f, 1.0f);
+             Content.hover.setPitch(hoverID,  pitch);
+             Content.hover.setVolume(hoverID, volume / this.playerCount);
         }
 
         int lapsPassed = car.testIfPassedGoal(world.getTrack());
@@ -162,16 +197,45 @@ public class Player {
 
             if (this.finished()) {
                 this.finish();
+            } else if(this.lapCount > 1) {
+                Content.perfect.play(0.7f);
             }
+        } else if (lapsPassed < 0 && this.car.isActive()) {
+            Content.toobad.play(0.75f);
         }
 
         this.world.getTrack().getTrackMesh().getCoordinatesFromVertex(this.minimapPosition, this.car.getPosition());
     }
 
+    /**
+     * Pulls the camera behind the car.
+     */
+    public void pullCameraBehind() {
+        Vector3 relativeZ = new Vector3(this.car.getRelativeZ());
+        relativeZ.y = 0f;
+        relativeZ.nor();
+
+        float pullback = 150f;
+        float yPullback = 66f;
+        float t = this.car.getRigidBody().getLinearVelocity().len2() / (600 * 600);
+        t = MathUtils.clamp(t, 0, 1);
+        pullback += Utilities.quadraticEasing(0f, 100f, t);
+
+        if (firstPerson) {
+            pullback = -75f;
+            yPullback = 20f;
+        }
+
+        cam.position.set(relativeZ).scl(-pullback).add(this.car.getPosition());
+        cam.position.add(0f, yPullback, 0f);
+        cam.direction.set(relativeZ);
+        cam.up.set(Vector3.Y);
+    }
+
     public void draw(ModelBatch modelBatch) {
         viewport.apply();
 
-        car.pullCameraBehind(this.cam);
+        this.pullCameraBehind();
 
         cam.update();
         modelBatch.begin(this.cam);

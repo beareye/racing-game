@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.jajebr.game.engine.Director;
+import com.jajebr.game.game.Content;
 
 import java.util.Map;
 
@@ -91,6 +92,9 @@ public class PlayerInputController implements ControllerListener, InputProcessor
         if (listeningForNewControllers) {
             if (!availableControllers.contains(controller)) {
                 availableControllers.add(controller);
+                Content.enter.play();
+            } else {
+                Content.blip.play();
             }
         }
         Player controlledPlayer = controllerPlayerMap.get(controller);
@@ -141,7 +145,12 @@ public class PlayerInputController implements ControllerListener, InputProcessor
     @Override
     public boolean keyDown(int keycode) {
         if (listeningForNewControllers && keycode != Input.Keys.ENTER) {
-            useKeyboard = true;
+            if (!useKeyboard) {
+                useKeyboard = true;
+                Content.enter.play();
+            } else {
+                Content.blip.play();
+            }
         }
         if (keyboardPlayer != null) {
             keyboardPlayer.getPlayerInput().updateKey(keycode, true);

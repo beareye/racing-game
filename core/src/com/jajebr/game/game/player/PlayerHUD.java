@@ -158,14 +158,18 @@ public class PlayerHUD {
     }
 
     private void drawMinimap(SpriteBatch spriteBatch, Array<Player> players) {
+        float scale = 1.5f;
+        if (players.size > 16) {
+            scale = 0.75f;
+        }
         Texture pixmapTexture = player.getWorld().getTrack().getPixmapTexture();
         spriteBatch.setColor(Color.WHITE);
         spriteBatch.draw(
                 pixmapTexture,
-                this.view.x + this.view.width - pixmapTexture.getWidth() * 1.5f,
-                this.view.y + this.view.height - pixmapTexture.getHeight() * 1.5f,
-                pixmapTexture.getWidth() * 1.5f,
-                pixmapTexture.getHeight() * 1.5f
+                this.view.x + this.view.width - pixmapTexture.getWidth() * scale,
+                this.view.y + this.view.height - pixmapTexture.getHeight() * scale,
+                pixmapTexture.getWidth() * scale,
+                pixmapTexture.getHeight() * scale
         );
 
         // Can't use iterator for nested loops.
@@ -181,8 +185,8 @@ public class PlayerHUD {
 
             spriteBatch.draw(
                     Content.white,
-                    this.view.x + this.view.width - pixmapTexture.getWidth() * 1.5f + minimapPosition.x * 1.5f - 3.5f,
-                    this.view.y + this.view.height - minimapPosition.y * 1.5f - 3.5f,
+                    this.view.x + this.view.width - pixmapTexture.getWidth() * scale + minimapPosition.x * scale - 3.5f,
+                    this.view.y + this.view.height - minimapPosition.y * scale - 3.5f,
                     7,
                     7
             );

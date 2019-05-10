@@ -103,6 +103,10 @@ public class World {
         return rankings;
     }
 
+    public boolean isNighttime() {
+        return nighttime;
+    }
+
     public World() {
         gravity = 9.8f;
         dragCoefficient = 0.5f;
@@ -216,9 +220,6 @@ public class World {
     public void render(ModelBatch modelBatch) {
         modelBatch.render(skybox);
 
-        if (!Gdx.input.isKeyPressed(Input.Keys.O) && entities.size > 0) {
-            entities.get(0).pullCameraBehind(modelBatch.getCamera());
-        }
         track.draw(modelBatch, this.environment);
         for (Entity entity : entities) {
             entity.getRigidBody().getWorldTransform(entity.getModelInstance().transform);

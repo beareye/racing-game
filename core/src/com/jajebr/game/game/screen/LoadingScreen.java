@@ -1,12 +1,14 @@
 package com.jajebr.game.game.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.jajebr.game.engine.Director;
 import com.jajebr.game.engine.screen.Screen;
 import com.jajebr.game.game.Content;
+import com.jajebr.game.game.player.PlayerInputController;
 
 public class LoadingScreen extends Screen {
     private SpriteBatch spriteBatch;
@@ -25,7 +27,11 @@ public class LoadingScreen extends Screen {
     public void update(float dt) {
         if (Content.isFinished()) {
             Content.load();
-            Director.log("Loading");
+
+            Director.setPlayerInputController(new PlayerInputController());
+            Controllers.addListener(Director.getPlayerInputController());
+            Gdx.input.setInputProcessor(Director.getPlayerInputController());
+
             Director.changeScreen(new ControllerAssignScreen());
         }
     }

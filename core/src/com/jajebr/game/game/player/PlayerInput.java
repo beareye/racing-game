@@ -43,6 +43,12 @@ public class PlayerInput {
                 case 2:
                     this.reverse = pressed;
                     break;
+                // Triangle
+                case 3:
+                    if (pressed) {
+                        this.player.setFirstPerson(!this.player.isFirstPerson());
+                    }
+                    break;
                 // L
                 case 4:
                     this.driftingLeft = pressed;
@@ -78,6 +84,11 @@ public class PlayerInput {
                 break;
             case Input.Keys.E:
                 this.driftingRight = pressed;
+                break;
+            case Input.Keys.TAB:
+                if (pressed) {
+                    this.player.setFirstPerson(!this.player.isFirstPerson());
+                }
                 break;
             case Input.Keys.LEFT:
                 if (pressed) {

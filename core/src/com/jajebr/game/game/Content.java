@@ -2,6 +2,8 @@ package com.jajebr.game.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes;
@@ -34,11 +36,41 @@ public class Content {
 
     public static Model boxModel;
 
+    public static Music jackson;
+    public static Music game;
+    public static Music night;
+
+    public static Sound finish;
+    public static Sound go;
+    public static Sound perfect;
+    public static Sound ready;
+    public static Sound thanks;
+    public static Sound toobad;
+    public static Sound win;
+    public static Sound hover;
+    public static Sound boost;
+    public static Sound enter;
+    public static Sound blip;
+
     public static void init() {
         assetManager.load("models/formulastar/formulastar.obj", Model.class);
         assetManager.load("models/inwardCube/inwardCube.obj", Model.class);
         assetManager.load("textures/materials.png", Texture.class);
         assetManager.load("textures/white.png", Texture.class);
+        assetManager.load("music/JACKSON.ogg", Music.class);
+        assetManager.load("music/game.ogg", Music.class);
+        assetManager.load("music/night.ogg", Music.class);
+        assetManager.load("sounds/smb2/finish.wav", Sound.class);
+        assetManager.load("sounds/smb2/go.wav", Sound.class);
+        assetManager.load("sounds/smb2/perfect.wav", Sound.class);
+        assetManager.load("sounds/smb2/ready.wav", Sound.class);
+        assetManager.load("sounds/smb2/thanks.wav", Sound.class);
+        assetManager.load("sounds/smb2/toobad.wav", Sound.class);
+        assetManager.load("sounds/smb2/win.wav", Sound.class);
+        assetManager.load("sounds/hover.wav", Sound.class);
+        assetManager.load("sounds/boost.wav", Sound.class);
+        assetManager.load("sounds/enter.wav", Sound.class);
+        assetManager.load("sounds/blip.wav", Sound.class);
 
         Content.createFonts();
 
@@ -65,6 +97,20 @@ public class Content {
         inwardCube = assetManager.get("models/inwardCube/inwardCube.obj", Model.class);
         materials = assetManager.get("textures/materials.png", Texture.class);
         white = assetManager.get("textures/white.png", Texture.class);
+        jackson = assetManager.get("music/JACKSON.ogg", Music.class);
+        game = assetManager.get("music/game.ogg", Music.class);
+        night = assetManager.get("music/night.ogg", Music.class);
+        finish = assetManager.get("sounds/smb2/finish.wav", Sound.class);
+        go = assetManager.get("sounds/smb2/go.wav", Sound.class);
+        perfect = assetManager.get("sounds/smb2/perfect.wav", Sound.class);
+        ready = assetManager.get("sounds/smb2/ready.wav", Sound.class);
+        thanks = assetManager.get("sounds/smb2/thanks.wav", Sound.class);
+        toobad = assetManager.get("sounds/smb2/toobad.wav", Sound.class);
+        win = assetManager.get("sounds/smb2/win.wav", Sound.class);
+        hover = assetManager.get("sounds/hover.wav", Sound.class);
+        enter = assetManager.get("sounds/enter.wav", Sound.class);
+        boost = assetManager.get("sounds/boost.wav", Sound.class);
+        blip = assetManager.get("sounds/blip.wav", Sound.class);
     }
 
     public static Rectangle getMaterialTexture(TrackTexture trackTexture) {

@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
@@ -31,6 +32,12 @@ public class MainGameScreen extends Screen {
     private Array<Player> players;
 
     private Timer fadeOutTimer;
+    private Timer elapsedTimer;
+
+    private int currentNumberOnCountdown = 4;
+
+    private boolean started;
+    private boolean thanks;
 
     public MainGameScreen(int numPlayers) {
         modelBatch = new ModelBatch();
@@ -39,14 +46,22 @@ public class MainGameScreen extends Screen {
         world = new World();
 
         this.players = new Array<Player>();
+        if (numPlayers > 16) {
+            Content.normalFont.getData().setScale(0.5f);
+        }
         for (int i = 0; i < numPlayers; i++) {
             Player player = new Player(i, numPlayers, this.world);
             players.add(player);
-            world.getEnvironment().add(player.getPlayerLight());
             Director.getPlayerInputController().assignControllerToPlayer(player);
         }
 
         this.fadeOutTimer = new Timer(true);
+        this.elapsedTimer = new Timer(true);
+
+        this.started = false;
+        this.thanks = false;
+
+        Content.ready.play();
     }
 
     @Override
@@ -56,11 +71,45 @@ public class MainGameScreen extends Screen {
         }
         world.update(dt);
 
+        this.elapsedTimer.update(dt);
+        if (!this.started) {
+            if (5 - (int) this.elapsedTimer.getTimeElapsed() != currentNumberOnCountdown) {
+                currentNumberOnCountdown = 5 - (int) this.elapsedTimer.getTimeElapsed();
+                if (currentNumberOnCountdown >= 1 && currentNumberOnCountdown <= 3) {
+                    Content.blip.play();
+                }
+            }
+
+            if (this.elapsedTimer.getTimeElapsed() >= Constants.COUNTDOWN) {
+                this.started = true;
+
+                if (this.world.isNighttime()) {
+                    Content.night.setLooping(true);
+                    Content.night.play();
+                } else {
+                    Content.game.setLooping(true);
+                    Content.game.play();
+                }
+                Content.go.play();
+                Content.blip.play(1f, 2f, 0f);
+            }
+        }
+
         if (world.finished(players.size)) {
             this.fadeOutTimer.update(dt);
 
+            if (!thanks && this.fadeOutTimer.getTimeElapsed() > 5f) {
+                thanks = true;
+                Content.thanks.play();
+            }
             if (this.fadeOutTimer.getTimeElapsed() > 10f) {
                 Director.changeScreen(new ControllerAssignScreen());
+                if (this.world.isNighttime()) {
+                    Content.night.stop();
+                } else {
+                    Content.game.stop();
+                }
+                Content.thanks.play();
             }
         }
 

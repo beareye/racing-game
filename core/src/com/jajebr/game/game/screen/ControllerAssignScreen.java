@@ -36,6 +36,11 @@ public class ControllerAssignScreen extends Screen {
 
         Director.getPlayerInputController().reset();
         Director.getPlayerInputController().startListening();
+
+        Content.normalFont.getData().setScale(1f);
+
+        Content.jackson.setLooping(true);
+        Content.jackson.play();
     }
 
     @Override
@@ -44,7 +49,10 @@ public class ControllerAssignScreen extends Screen {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER) && Director.getPlayerInputController().getNumPlayers() > 0) {
             Director.getPlayerInputController().stopListening();
-            Director.changeScreen(new MainGameScreen(Director.getPlayerInputController().getNumPlayers()));
+            int players = Director.getPlayerInputController().getNumPlayers();
+            Director.changeScreen(new MainGameScreen(players));
+
+            Content.jackson.stop();
         }
     }
 
@@ -54,6 +62,14 @@ public class ControllerAssignScreen extends Screen {
         spriteBatch.begin();
             ObjectSet.ObjectSetIterator<Controller> it = Director.getPlayerInputController().getAvailableControllers().iterator();
             float y = Gdx.graphics.getHeight() - 100f;
+            glyphLayout.setText(Content.normalFont, "TURBO BOOST");
+            Content.normalFont.setColor(Color.CYAN);
+            Content.normalFont.draw(
+                    spriteBatch,
+                    "TURBO BOOST",
+                    Gdx.graphics.getWidth() / 2f - glyphLayout.width / 2f,
+                    Gdx.graphics.getHeight() - glyphLayout.height - 20f
+            );
             while (it.hasNext) {
                 Controller controller = it.next();
                 glyphLayout.setText(Content.normalFont, controller.getName());

@@ -23,10 +23,6 @@ public class RacingGame extends ApplicationAdapter {
 
 		dtTimer = 0.0f;
 		Director.changeScreen(new LoadingScreen());
-
-		Director.setPlayerInputController(new PlayerInputController());
-		Controllers.addListener(Director.getPlayerInputController());
-		Gdx.input.setInputProcessor(Director.getPlayerInputController());
 	}
 
 	@Override

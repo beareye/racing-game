@@ -87,8 +87,8 @@ public class EntityCar extends Entity {
 
         this.input = playerInput;
 
-        thrustForce = 400000f;
-        brakeForce = 375000f;
+        thrustForce = 425000f;
+        brakeForce = 400000f;
     }
 
     @Override
@@ -166,6 +166,9 @@ public class EntityCar extends Entity {
                 // Stop drifting
                 this.drifting = false;
                 float driftBoost = Math.min(this.driftBoost, maxDriftBoost);
+
+                float volume = driftBoost / maxDriftBoost;
+                Content.boost.play(volume);
 
                 // Apply drift force
                 this.getRigidBody().applyCentralImpulse(new Vector3(this.getRelativeZ()).scl(driftBoost));
