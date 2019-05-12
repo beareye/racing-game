@@ -139,9 +139,9 @@ public class PlayerInput {
     }
 
     public void mobileUpdate(float dt) {
-        float accelX = Gdx.input.getAccelerometerX() / 10;
-        float accelY = Gdx.input.getAccelerometerY() / 10;
-        float accelZ = Gdx.input.getAccelerometerZ() / 10;
+        float accelX = Gdx.input.getAccelerometerX() / 5;
+        float accelY = Gdx.input.getAccelerometerY() / 5;
+        float accelZ = Gdx.input.getAccelerometerZ() / 5;
 
         if (Gdx.input.isTouched()) {
             this.accelerate = true;
@@ -149,10 +149,22 @@ public class PlayerInput {
             this.accelerate = false;
         }
 
-        this.leftRight = accelY;
-        if (accelZ < 0.8) { // Reverse
+        this.leftRight = accelY / 2f;
+        if (accelY < -1f) {
+            this.driftingLeft = true;
+            this.driftingRight = false;
+        } else if (accelY > 1f) {
+            this.driftingLeft = false;
+            this.driftingRight = true;
+        } else {
+            this.driftingLeft = false;
+            this.driftingRight = false;
+        }
+        if (accelZ < 0.5) { // Reverse
             this.reverse = true;
             this.accelerate = false;
+        } else {
+            this.reverse = false;
         }
     }
 }
