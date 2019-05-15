@@ -12,6 +12,7 @@
 		body {
 			margin-left: 20em;
 			margin-right: 20em;
+			background-color: hsl(0, 100%, 98%);
 		}
 
 		p {
@@ -40,13 +41,29 @@
 			max-width: 100%;
 			width: 100%;
 		}
+
+		.centered {
+			margin: 0 auto;
+			text-align: center;
+		}
+
+		.subtitle {
+			text-color: gray;
+		}
+
+		.titles {
+			margin: 0;
+		}
   </style> 
 <title>Final Deliverable</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
 </head>
 <body>
-	<h1 align="middle">Turbo Blast, racing simulator: Final Deliverable</h1>
+	<div class="centered">
+		<h1> Turbo Blast: Final Deliverable</h1>
+		<h3 class="subtitle">Racing Simulator</h2>
+	</div>
 	
 	<h2 align="middle">Jeffrey Wang - 3031868633</h2>
     <h2 align="middle">Brandon Chan - 3032697865</h2>
@@ -62,7 +79,12 @@
 		create an immersive game experience. 
 	</p>
 	<div>
-		
+
+		<div>
+			<h2 class="centered">
+				<a href="https://github.com/beareye/racing-game/releases"> Download the game for Windows/Linux/OSX/Android here!</a>
+			</h2>
+		</div>
 
 		<h2 align = "middle"> Technical Approach </h2>	
 
@@ -115,35 +137,38 @@
 
 
 		<h3> Player Controls/Gameplay/HUD</h3>
-		<p> The controls that we implemented were pretty intuitive. For keyboard, up/down was accelerate/decelerate, left/right for turning, and q/e for drifting left and right. For controllers, the joystick was used for left/right movement, a/b for accel/decel and L/R for drifting. The game supports up to 64 players on one screen, though more than 4 players usually crowds the screen as well as drops the fps below 60 frames, which makes 
+		<p> The controls that we implemented were pretty intuitive. For keyboard, Up/Down was accelerate/decelerate, Left/Right for turning, Tab to change persepectives, and Q/E for drifting left and right.
+			For controllers, the joystick was used for left/right movement, A/B for acceleration/deceleration, Y to change persepectives, and L/R for drifting.
+			For Android devices, we let the accelerometer move the car, and the touch screen handles acceleration (drifting is automatic).
+			The game supports up an infinite amount of players on one screen, though more than 9 players usually crowds the screen as well as drops the frames per second (FPS) below 60 FPS, which makes 
 			the game look choppy. The split-screen capabilities were implemented by taking the square root of how many players connected and rounding up. For example, if 3 players connected, the square root of three is between 1 and 2, so we round up to 2 and 
-			divide the screen both ways in half to create a possibility of 4 screens. 
+			divide the screen both ways in half to create a possibility of 4 screens. We create various viewports of different offsets and resolutions and apply them when rendering the world.
 		</p>
-		<p> The game itself plays like a racing game like Need For Speed, as it is a lap-based racing game and the player can change between a 3rd person and 1st person viewpoint. The timer is shown on the bottom left, along with how many laps. On the top right is a minimap showing a rough overview of the track layout and where you are currently positioned, which was implemented by just using a very pixelated overhead of the heightmap. 
+		<p> The game itself plays like a racing game like Need For Speed, as it is a lap-based racing game and the player can change between a 3<sup>rd</sup> person and 1<sup>st</sup> person viewpoint. The timer is shown on the bottom left, along with how many laps. On the top right is a minimap showing a rough overview of the track layout and where you are currently positioned, which was implemented by just using a very pixelated overhead of the heightmap. 
 			All of these things like the timer and lap number are saved in the World class, and updated as needed. 
 		</p>
 
 
 		<h3> Lessons Learned</h3>
-		<p> <ul> <li> Game development is time consuming</li>
+		<p> <ul> <li> Game development is time consuming!</li>
 			<li> You should use all available resources: In the case of our physics engine, we spent a good amount of time trying to do collisions with ray-tracing and implementing it ourselves, but it ended up not working properly for all cases, and was a pain to fix. We should have done more research before diving straight into coding and used resources that the framework provided to make our lives easier.</li>
-			<li> More specifically, rendering a game is extremely intensive to the GPU, especially if there are a large amount of objects to render. We learned to use a BVH to do more real-time rendering of environmental objects so our game could still run smoothly.</li>
+			<li> Real-time rendering in games is extremely intensive to both the GPU and CPU, especially if there are a large amount of objects to render. We learned to use a BVH to do more real-time rendering of environmental objects so our game could still run smoothly.</li>
 			<li> When doing random generation like we did with the terrain, bugs are more likely to appear, and in some cases, our vehicle could slip through a crack in the terrain and subvert the track and get straight to the finish line.</li>
 		</ul></p>
 
 
-		<h2 align = "middle">Results & Video </h2>
+		<h2 align = "middle">Results & Videos </h2>
 		<div class="flexContainer">
 			<figure>
 				<img src="./images/test_1.gif" alt="GIF of car moving about">
 				<figcaption>
-					Our car moving around. The lighting of the environment is given by (a) an ambient light, (b) a diffuse component, and (c) and a specular component. This is a preliminary result of implementing the heightmap for the terrain.
+					Our car moving around in an early build. The lighting of the environment is given by (a) an ambient light, (b) a diffuse component, and (c) and a specular component. This is a preliminary result of implementing the heightmap for the terrain.
 				</figcaption>
 			</figure>
 			<figure>
 				<img src="./images/test_2.gif" alt="GIF of the terrain">
 				<figcaption>
-					Zooming out of the terrain to show the heightmap
+					Zooming out of the terrain to show the heightmap.
 				</figcaption>
 			</figure>
 		</div>
@@ -162,20 +187,20 @@
 					<figure>
 						<img src="./images/TurboBoostFPS_615_9_20199.gif" alt="GIF of car moving about">
 						<figcaption>
-							How the game handles collision: it recenters the vehicle back on the track
+							Collisions with the world change the rotation of the rigid bodies. We recenter the vehicle back on the track by gradually resetting angular displacements via feedback.
 						</figcaption>
 					</figure>
 				</div>
 	</div>
-
-	<h3>
-		<a href="https://www.youtube.com/watch?v=lF3e_dZsW3s&feature=youtu.be">Final Video</a>
-	</h3>
-
 	
-	<iframe width="420" height="315"
-src="https://www.youtube.com/embed/lF3e_dZsW3s">
-</iframe>
+	<h2 class="centered">
+			<a href="https://www.youtube.com/watch?v=lF3e_dZsW3s&feature=youtu.be">Final Video</a>
+		</h2>
+
+	<div class="flexContainer">
+	<iframe width="420" height="315" src="https://www.youtube.com/embed/lF3e_dZsW3s" class="centered">
+	</iframe>
+</div>
 
 
 		<h2 align = "middle">
@@ -183,9 +208,9 @@ src="https://www.youtube.com/embed/lF3e_dZsW3s">
 		</h2>
 	<p>Here is a list of resources used, from LibGDX tutorials to game physics articles</p>
 	<ul> 
-		<li><a href="https://www.gamefromscratch.com/page/LibGDX-Tutorial-series.aspx">LibGDX tutorial</a>
+		<li><a href="https://www.gamefromscratch.com/page/LibGDX-Tutorial-series.aspx">libGDX tutorial</a>
 		</li>
-		<li> <a href="https://libgdx.badlogicgames.com/ci/nightlies/docs/api/com/badlogic/gdx/backends/lwjgl/LwjglApplicationConfiguration.html">LibGDX API</a>
+		<li> <a href="https://libgdx.badlogicgames.com/ci/nightlies/docs/api/com/badlogic/gdx/backends/lwjgl/LwjglApplicationConfiguration.html">libGDX API</a>
 		</li>
 		<li> <a href = "https://github.com/libgdx/libgdx/wiki/Bullet-physics"> Bullet Physics Library</a></li>
 		<li> <a href="https://superheroesinracecars.com/2016/08/11/implementing-racing-games-an-intro-to-different-approaches-and-their-game-design-trade-offs"/>Acceleration and turn physics</a></li>
@@ -194,9 +219,9 @@ src="https://www.youtube.com/embed/lF3e_dZsW3s">
     
 	<h2 align = "middle">Contributions</h2>
 	<ul>
-		<li>Brandon :Implemented the heightmap mesh for terrain and track. Integrated the Bullet Physics library to work for both collisions and drag/torque forces for drifting. Helped create an intuitive game HUD and game experience.</li>
-		<li>Jeffrey : Modeled vehicle, trees, and rocks in blender, and then implemented the algorithm to randomly place the objects on the terrain. Created the music for the game and the videos for the deliverables.</li>
-		<li>Jason : Researched acceleration physics and LibGDX libraries. Completed Deliverable 1, Presentation Slides, Final Deliverable. Helped to create game experience by fixing lap count and timer.</li>
+		<li>Brandon: Implemented the heightmap mesh for terrain and track. Integrated the Bullet Physics library to work for both collisions and drag/torque forces for drifting. Prepared some models with Blender. Helped create an intuitive game HUD and game experience.</li>
+		<li>Jeffrey: Modeled vehicle, trees, and rocks in blender, and then implemented the algorithm to randomly place the objects on the terrain. Created the music for the game and the videos for the deliverables.</li>
+		<li>Jason: Researched acceleration physics and LibGDX libraries. Completed Deliverable 1, Presentation Slides, Final Deliverable. Helped to create game experience by fixing lap count and timer.</li>
 	</ul>
 </body>
 </html>
