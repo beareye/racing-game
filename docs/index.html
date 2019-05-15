@@ -1,105 +1,183 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-<style>  
+<style> 
     div.padded {  
       padding-top: 0px;  
       padding-right: 100px;  
       padding-bottom: 0.25in;  
       padding-left: 100px;  
-    }  
+    }
+
+		body {
+			margin-left: 20em;
+			margin-right: 20em;
+		}
+
+		p {
+			text-indent: 2em;
+			font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; font-size:20px;
+		}
+
+		ul{
+			font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; font-size:16px;
+		}
+
+		ol{
+			font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; font-size:16px;
+		}
+
+		.flexContainer {
+			display: flex;
+			justify-content: center;
+			text-align: center;
+			width: 100%;
+		}
+
+		.video {
+			margin: 0 auto;
+			height: 720px;
+			max-width: 100%;
+			width: 100%;
+		}
   </style> 
-<title>Final project proposal</title>
+<title>Final Deliverable</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
 </head>
 <body>
-	<h1 align="middle">Turbo Blast, racing simulator</h1>
+	<h1 align="middle">Turbo Blast, racing simulator: Final Deliverable</h1>
 	
 	<h2 align="middle">Jeffrey Wang - 3031868633</h2>
     <h2 align="middle">Brandon Chan - 3032697865</h2>
 	<h2 align="middle">Jason Hu - 3031829724</h2>
 	<br />
-	
-	<h3 align="middle">Turbo Blast is a third person racing game. Have a blast navigating through sharp turns and narrow roads as you compete against your friends. Purchase items like nails and broken tires to give your oppenents a hard time. If you don't have friends, don't worry: play against the CPU.</h3>
-	
-	<br />
-	<p>Problem: We are trying to solve multiple gaming problems. These include applying realistic acceleration and decceleration, calculating turning centripetal forces and turning radius, and collision detection with complex shapes. We will apply the laws of motion and kinematic physics to solve these problems. We will probably use estimations of these laws as to conserve computing power.</p>
-	<br />
-	
-	<p>
-		Goals: The main goal is to complete a well made game that is free of bugs and make it fun for users to play with. To do this we must accomplish multiple things:
-			<ul>
-				<li>Implement the physics correctly (see problem above)</li>
-				<li>Provide good perfomance and enforce FPS consistency, perhaps with the support of GPU</li>
-				<li>Make aesthetically pleasing models of the cars and map</li>
-			</ul>
-		Finally, the completed project will include an intuitive interface and also at least one playable racing track and multiple cars. There will be either a local multiplayer system or an AI system implemented so the user can compete against something.
-	</p> 
-	
-	<p>
-		To measure quality, we will simply demo the game to people. If they are having fun, then it is of good quality.
+
+	<h2 align = "middle">
+		Abstract
+	</h2>
+	<p>Turbo Blast is a multiplayer spaceship racing game implemented with Java under the LibGDX framework to help build and test the game. The game incorporates many technical aspects, including realistic accerleration and turning physics, 
+		collision detection, lighting, and geometric meshes to help texture map the racetrack. We took the knowledge learned in class about triangle meshes to implement a heightmap mesh, with each value of the heightmap having two different triangle meshes with different normals.
+		The heightmap was the then the main building block that facilitated creating the rest of the game environment, as it allowed for texture mapping for the hills as well as helped with placing the environmental object models like trees and rocks to make the game more immersive. The track, combined with the lighting and game physics
+		create an immersive game experience. 
 	</p>
-	
-	<p>
-		Possible goals: Because of the lack of time to deployment, it is possible we do not meet these requirements. This is okay though, as they are rather complex to implement.
-			<ul>
-				<li>Provide graphical improvements such as anti-aliasing and motion blur</li>
-				<li>Provide multiple racing tracks and implement a currency or unlocking system (not DLC thats lame) to incentivize good players</li>
-				<li>Provide online muliplayer</li>
-				<li>Provide GPU support and real-time ray-tracing using the RTX architecture</li>
-				<li>Other improvements that have not been considered during the planning phase</li>
-			</ul>
-	</p>
+	<div>
 		
-	<h3>Now we will discuss our timeline</h3>
+
+		<h2 align = "middle"> Technical Approach </h2>	
+
+		<h3> Physics </h3>
+		<p>
+			Implementing physics, in particular, was rough.
+			Originally, we intended to roll out our own physics engine. It used Modified Euler, and had entities move around by means of forces placed on the center.
+			Then we would resolve collisions by seeing where the entity would have went without an intersection, and moved those positions to the bounds of the intersection.
+			Thus, we would test collisions by means of any axis-aligned bounding box (AABB) intersections between entities and ray-triangle intersections between the entities
+			and the track. While this worked for most situations, moving at very certain angles would cause the ray intersections to fail, and would make the entities
+			move through the track. Coupled with the lack of accurate intersections and rotations, this problem seemed too frustrating.
+		</p>
+		<p>
+			Instead, we ended up using an existing physics engine to model our entities. In particular, we used the Bullet engine, a popular physics engine used for
+			AAA games like Grand Theft Auto. We used a Bullet wrapper for Java, which had plenty of shortcomings. While the Bullet wrapper allows Java applications to call
+			the Bullet library, calls to the library have no guarantees of memory safety or automatic garbage collection, unlike the Java virtual machine. Thus, we had
+			to keep track of every single allocated object, and dispose of them when not in use. If we don't, the memory leaks would rapidly multiply, as we update the game
+			60 frames per second.
+		</p>
+		<h3> Collisions </h3>
+		<p>
+			Collision detection was a major functionality of the game, as it is one of the major components that makes the game realistic. We ended up modeling the vehicle as a rigid body, so the vehicle is moved by applying forces to its center of mass. This facilitated our collision detection, because we could then use our physics engine to resolve any collisions 
+			between the rigid body and the terrain. The more challenging problem with collisions was how to fix the position of the vehicle after the collision occurred. The collision between the vehicle and the terrain often causes the vehicle to face upwards, so to solve this issue, we created a recentering method that would try to gradually 
+			reset the x and z axis of the vehicle back to normal, so when the vehicle accelerates, it can go forward again. This was particularly challenging, as sometimes the recentering never fully completes and the vehicle wobbles more than it should, but eventually, the vehicle does recenter.
+		</p>
+
+		<h3> World </h3>
+		<p>
+			We decided to make the terrain of the track a heightmap. While this prevents floor-over-floor scenarios
+			(like a dark cave, under a bridge, etc.), it allows us to quickly create tracks just by modifying a heightmap, which can be just a 2D array of floats. Creating the geometry for the
+			heightmap was slightly troublesome; we had to
+			<ol>
+				<li> define all the positions of the vertices of the heightmap </li>
+				<li> define all the normals of the vertices of the heightmap. For every triangle, we took the normalized cross product of the difference between the vertices.</li>
+				<li> define all the indices of the heightmap. We were able to follow a pattern to make this a lot easier to loop through. </li>
+				<li> define all the indices such that they were all winded clockwise. This allows OpenGL to cull the back faces and save a lot of time on rendering. </li>
+			</ol>
+			<p>Once this was done, we had an array of floats for the terrain, and thus we used polar coordinates to create the track that was surrounded by the terrain, which is then rendered into world space. </p>
+		</p>
+
+		<p>After all this was done, we needed to determine the starting position of the vehicle along with the direction of each lap of the race. These were both determined randomly, and the starting position additionally had a checkered flag texture mapped to it. </p>
+
+		<p>In relation to the environment around the track, we would randomize the time of day using a skybox that encompassed the whole world. If it were nighttime, then we would lower the amount of ambient light, and if it were daytime, then the ambient light was more intense. The ambient light was then combined with diffuse and specular lighting to make realistic 
+			world lighting depending on time of day. Additionally, we added trees and rocks by finding 3D models and importing them as ModelInstances, which we could then map onto a certain location on the terrain. Since the terrain was randomized with a 2D array of floats, we just chose from these floats to randomize the locations of rocks and trees. 
+			The challenge that came from adding the foliage was an intense drop in performance, with fps dropping from 60 to less than 10. To solve this problem, we implemented a BVH that would only render if it were in the bounding box that the camera could capture, which increased performance by a lot.
+		</p>
+
+		<p>Finally, all of this was enclosed in a class World.java, which when constructed, created the whole world. Encompassed in this class were the physical coefficients, like drag and gravity, as well as the diffuse and specular lighting, the track and terrain, and other game attributes, like the lap timer and skybox.</p>
+
+
+
+		<h3> Player Controls/Gameplay/HUD</h3>
+		<p> The controls that we implemented were pretty intuitive. For keyboard, up/down was accelerate/decelerate, left/right for turning, and q/e for drifting left and right. For controllers, the joystick was used for left/right movement, a/b for accel/decel and L/R for drifting. The game supports up to 64 players on one screen, though more than 4 players usually crowds the screen as well as drops the fps below 60 frames, which makes 
+			the game look choppy. The split-screen capabilities were implemented by taking the square root of how many players connected and rounding up. For example, if 3 players connected, the square root of three is between 1 and 2, so we round up to 2 and 
+			divide the screen both ways in half to create a possibility of 4 screens. 
+		</p>
+		<p> The game itself plays like a racing game like Need For Speed, as it is a lap-based racing game and the player can change between a 3rd person and 1st person viewpoint. The timer is shown on the bottom left, along with how many laps. On the top right is a minimap showing a rough overview of the track layout and where you are currently positioned, which was implemented by just using a very pixelated overhead of the heightmap. 
+			All of these things like the timer and lap number are saved in the World class, and updated as needed. 
+		</p>
+
+
+		<h3> Lessons Learned</h3>
+		<p> <ul> <li> Game development is time consuming</li>
+			<li> You should use all available resources: In the case of our physics engine, we spent a good amount of time trying to do collisions with ray-tracing and implementing it ourselves, but it ended up not working properly for all cases, and was a pain to fix. We should have done more research before diving straight into coding and used resources that the framework provided to make our lives easier.</li>
+			<li> More specifically, rendering a game is extremely intensive to the GPU, especially if there are a large amount of objects to render. We learned to use a BVH to do more real-time rendering of environmental objects so our game could still run smoothly.</li>
+			<li> When doing random generation like we did with the terrain, bugs are more likely to appear, and in some cases, our vehicle could slip through a crack in the terrain and subvert the track and get straight to the finish line.</li>
+		</ul></p>
+
+
+		<h2 align = "middle">Results & Video </h2>
+		<div class="flexContainer">
+			<figure>
+				<img src="./images/test_1.gif" alt="GIF of car moving about">
+				<figcaption>
+					Our car moving around. The lighting of the environment is given by (a) an ambient light, (b) a diffuse component, and (c) and a specular component.
+				</figcaption>
+			</figure>
+			<figure>
+				<img src="./images/test_2.gif" alt="GIF of the terrain">
+				<figcaption>
+					Zooming out of the terrain
+				</figcaption>
+			</figure>
+		</div>
+	</div>
+	<h3>
+		<a href="milestone.mp4">Final Video</a>
+	</h3>
+
 	
-	<p>
-		Week 1: We will spend this week learning how to use the LibGDX framework to create a third person game. We will probably make a simple 3D game as practice from a tutorial.
-	</p>
-	
-	<p>
-		Week 2: Develop the assets. Learn how to create the map, the cars, the obstacles, and the scenery (grass, flowers, trees). Perhaps compose some epic music and sound effects to complement the exciting race.
-	</p>
-	
-	<p>
-		Week 3: Develop the game now. Combining our knowledge from the first week and the assets we built during the second week, produce the racing game using the LibGDX framework.
-	</p>
-	
-	<p>
-		Week 4: Continue developing the game. As we finish, begin to severely test for bugs and fix performance blocks.
-	</p>
-	
-	<h3>Resources:</h3>
-	
-	<p>
-		Luckily for us, there are many different ways to learn LibGDX. Here are some we found from a quick literature search:
-		<ul>
-			<li>Game from scratch tutorial: https://www.gamefromscratch.com/page/LibGDX-Tutorial-series.aspx</li>
-			<li>Tutorial from the LibGDX source Github page: https://github.com/libgdx/libgdx/wiki/A-simple-game</li>
-			<li>Flappy bird tutorial: http://www.kilobolt.com/zombie-bird-tutorial-flappy-bird-remake.html</li>
-		</ul>
-	</p>
-	
-	<p>
-		To learn how to make 3D models and music:
-		<ul>
-			<li>3D game modeling for beginners: https://www.gamedesigning.org/learn/3d-modeling/</li>
-			<li>Blender tutorials: https://www.blender.org/support/tutorials/</li>
-			<li>How to make game music: https://www.youtube.com/watch?v=gMKLwmfYjH4 </li>
-		</ul>
-	</p>
-	
-	<p>
-		Some of these tutorials will be unnessessary for some members as they know how to use LibGDX, make models, or compose music.
-	</p>
-	
-	<p>
-		Since this is a video game, we will be drawing inspiration from other games including Mario Kart, Star Fox, and Wipeout.
-	</p>
-	
-	<h3>Now we will include a <a href="trees.html">tree</a> of GameObjects and their attributes. This will be updated as we realize more complexities of the game.</h3>
-	<h3>Two week update: <a href="deliv1.html">Deliverable 1</a> </h3>
-	
+	<video class="video" controls>
+		<source src="milestone.mp4" type="video/mp4">
+		Can't play the video. Click on the link above to download the video.
+	</video>
+
+
+		<h2 align = "middle">
+			References
+		</h2>
+	<p>Here is a list of resources used, from LibGDX tutorials to game physics articles</p>
+	<ul> 
+		<li><a href="https://www.gamefromscratch.com/page/LibGDX-Tutorial-series.aspx">LibGDX tutorial</a>
+		</li>
+		<li> <a href="https://libgdx.badlogicgames.com/ci/nightlies/docs/api/com/badlogic/gdx/backends/lwjgl/LwjglApplicationConfiguration.html">LibGDX API</a>
+		</li>
+		<li> <a href = "https://github.com/libgdx/libgdx/wiki/Bullet-physics"> Bullet Physics Library</a></li>
+		<li> <a href="https://superheroesinracecars.com/2016/08/11/implementing-racing-games-an-intro-to-different-approaches-and-their-game-design-trade-offs"/>Accerleration and turn physics</a></li>
+	</ul>
+		
+    
+	<h2 align = "middle">Contributions</h2>
+	<ul>
+		<li>Brandon :</li>
+		<li>Jeffrey :</li>
+		<li>Jason :</li>
+	</ul>
 </body>
 </html>
