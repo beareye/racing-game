@@ -137,26 +137,45 @@
 			<figure>
 				<img src="./images/test_1.gif" alt="GIF of car moving about">
 				<figcaption>
-					Our car moving around. The lighting of the environment is given by (a) an ambient light, (b) a diffuse component, and (c) and a specular component.
+					Our car moving around. The lighting of the environment is given by (a) an ambient light, (b) a diffuse component, and (c) and a specular component. This is a preliminary result of implementing the heightmap for the terrain.
 				</figcaption>
 			</figure>
 			<figure>
 				<img src="./images/test_2.gif" alt="GIF of the terrain">
 				<figcaption>
-					Zooming out of the terrain
+					Zooming out of the terrain to show the heightmap
 				</figcaption>
 			</figure>
 		</div>
+		<div class="flexContainer">
+				<figure>
+						<video class="video" controls>
+								<source src="./images/RacingGame.mp4" type="video/mp4">
+									</video>
+					<figcaption>
+						This is one lap of an intermediate step of the process, where trees and rocks were not yet added, and the color was not yet randomized. 
+					</figcaption>
+
+				</figure>
+			</div>
+			<div class="flexContainer">
+					<figure>
+						<img src="./images/TurboBoostFPS_615_9_20199.gif" alt="GIF of car moving about">
+						<figcaption>
+							How the game handles collision: it recenters the vehicle back on the track
+						</figcaption>
+					</figure>
+				</div>
 	</div>
+
 	<h3>
-		<a href="milestone.mp4">Final Video</a>
+		<a href="https://www.youtube.com/watch?v=lF3e_dZsW3s&feature=youtu.be">Final Video</a>
 	</h3>
 
 	
-	<video class="video" controls>
-		<source src="milestone.mp4" type="video/mp4">
-		Can't play the video. Click on the link above to download the video.
-	</video>
+	<iframe width="420" height="315"
+src="https://www.youtube.com/embed/lF3e_dZsW3s">
+</iframe>
 
 
 		<h2 align = "middle">
@@ -169,15 +188,15 @@
 		<li> <a href="https://libgdx.badlogicgames.com/ci/nightlies/docs/api/com/badlogic/gdx/backends/lwjgl/LwjglApplicationConfiguration.html">LibGDX API</a>
 		</li>
 		<li> <a href = "https://github.com/libgdx/libgdx/wiki/Bullet-physics"> Bullet Physics Library</a></li>
-		<li> <a href="https://superheroesinracecars.com/2016/08/11/implementing-racing-games-an-intro-to-different-approaches-and-their-game-design-trade-offs"/>Accerleration and turn physics</a></li>
+		<li> <a href="https://superheroesinracecars.com/2016/08/11/implementing-racing-games-an-intro-to-different-approaches-and-their-game-design-trade-offs"/>Acceleration and turn physics</a></li>
 	</ul>
 		
     
 	<h2 align = "middle">Contributions</h2>
 	<ul>
-		<li>Brandon :</li>
-		<li>Jeffrey :</li>
-		<li>Jason :</li>
+		<li>Brandon :Implemented the heightmap mesh for terrain and track. Integrated the Bullet Physics library to work for both collisions and drag/torque forces for drifting. Helped create an intuitive game HUD and game experience.</li>
+		<li>Jeffrey : Modeled vehicle, trees, and rocks in blender, and then implemented the algorithm to randomly place the objects on the terrain. Created the music for the game and the videos for the deliverables.</li>
+		<li>Jason : Researched acceleration physics and LibGDX libraries. Completed Deliverable 1, Presentation Slides, Final Deliverable. Helped to create game experience by fixing lap count and timer.</li>
 	</ul>
 </body>
 </html>
