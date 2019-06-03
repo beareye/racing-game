@@ -59,13 +59,14 @@ public class PlayerInput {
                     break;
             }
         } else {
+            // XInput
             switch (button) {
                 // B
                 case 1:
                     this.reverse = pressed;
                     break;
                 // A
-                case 2:
+                case 0:
                     this.accelerate = pressed;
                     break;
                 // X
@@ -160,7 +161,7 @@ public class PlayerInput {
             this.driftingLeft = false;
             this.driftingRight = false;
         }
-        if (accelZ < 0.5) { // Reverse
+        if (accelZ < 0.2) { // Reverse
             this.reverse = true;
             this.accelerate = false;
         } else {

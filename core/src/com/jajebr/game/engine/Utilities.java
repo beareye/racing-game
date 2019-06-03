@@ -83,4 +83,13 @@ public class Utilities {
                 return Color.GREEN;
         }
     }
+
+    /**
+     * Converts a value in kilometers per hour (KMH) to miles (MPH).
+     * @param value the value in kilometers per hour
+     * @return the value in miles per hour
+     */
+    public static float convertKMHToMPH(float value) {
+        return value / 1.6f;
+    }
 }

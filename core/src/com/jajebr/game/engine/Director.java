@@ -44,7 +44,9 @@ public class Director {
     }
 
     public static void log(String message) {
-        Gdx.app.log(Constants.APP_ID, message);
+        if (Director.DEBUG) {
+            Gdx.app.log(Constants.APP_ID, message);
+        }
     }
 
     public static void swapFullscreen() {

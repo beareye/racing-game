@@ -160,10 +160,6 @@ public class BVHNode {
         }
     }
 
-    private void extendBoundingBox(BoundingBox box1, BoundingBox box2) {
-
-    }
-
     public boolean isLeaf() {
         return this.left == null && this.right == null;
     }

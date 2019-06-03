@@ -103,7 +103,8 @@ public class PlayerHUD {
                         this.view.y + 33 + glyphLayout.height * 2
                 );
 
-                String speed = Math.round(this.player.getCar().getRigidBody().getLinearVelocity().len()) + " KMH";
+                float kmh = this.player.getCar().getRigidBody().getLinearVelocity().len();
+                String speed = Math.round(Utilities.convertKMHToMPH(kmh)) + " MPH";
                 glyphLayout.setText(Content.normalFont, speed);
                 Content.normalFont.setColor(Color.RED);
                 Content.normalFont.draw(

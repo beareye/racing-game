@@ -68,11 +68,11 @@ public class ControllerAssignScreen extends Screen {
         spriteBatch.begin();
             ObjectSet.ObjectSetIterator<Controller> it = Director.getPlayerInputController().getAvailableControllers().iterator();
             float y = Gdx.graphics.getHeight() - 100f;
-            glyphLayout.setText(Content.normalFont, "TURBO BOOST");
+            glyphLayout.setText(Content.normalFont, "TURBO BLAST");
             Content.normalFont.setColor(Color.CYAN);
             Content.normalFont.draw(
                     spriteBatch,
-                    "TURBO BOOST",
+                    "TURBO BLAST",
                     Gdx.graphics.getWidth() / 2f - glyphLayout.width / 2f,
                     Gdx.graphics.getHeight() - glyphLayout.height - 20f
             );
@@ -103,11 +103,15 @@ public class ControllerAssignScreen extends Screen {
             }
 
             if (Director.getPlayerInputController().getNumPlayers() > 0) {
-                glyphLayout.setText(Content.normalFont, "PRESS ENTER TO START");
+                String text = "PRESS ENTER TO START";
+                if (Gdx.app.getType() == Application.ApplicationType.Android) {
+                    text = "TAP TO START";
+                }
+                glyphLayout.setText(Content.normalFont, text);
                 Content.normalFont.setColor(Color.GOLD);
                 Content.normalFont.draw(
                         spriteBatch,
-                        "PRESS ENTER TO START",
+                        text,
                         Gdx.graphics.getWidth() / 2f - glyphLayout.width / 2f,
                         133
                 );
