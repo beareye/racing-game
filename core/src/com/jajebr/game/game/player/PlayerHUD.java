@@ -136,24 +136,27 @@ public class PlayerHUD {
                         this.view.y + this.view.height - 20 - glyphLayout.height
                 );
 
-                String rankString = Utilities.rankToString(this.player.getRank());
-                Content.normalFont.setColor(Utilities.getRankColor(this.player.getRank()));
-                glyphLayout.setText(Content.normalFont, rankString);
-                Content.normalFont.draw(
-                        spriteBatch,
-                        rankString,
-                        this.view.x + this.view.width / 2f - glyphLayout.width / 2f,
-                        this.view.y + this.view.height / 2f - glyphLayout.height / 2f
-                );
+                if (!player.isRetired()) {
 
-                String elapsedTime = "FINAL TIME: " + this.player.getElapsedTimer().toString();
-                glyphLayout.setText(Content.normalFont, elapsedTime);
-                Content.normalFont.draw(
-                        spriteBatch,
-                        elapsedTime,
-                        this.view.x + this.view.width / 2 - glyphLayout.width / 2,
-                        this.view.y + 33
-                );
+                    String rankString = Utilities.rankToString(this.player.getRank());
+                    Content.normalFont.setColor(Utilities.getRankColor(this.player.getRank()));
+                    glyphLayout.setText(Content.normalFont, rankString);
+                    Content.normalFont.draw(
+                            spriteBatch,
+                            rankString,
+                            this.view.x + this.view.width / 2f - glyphLayout.width / 2f,
+                            this.view.y + this.view.height / 2f - glyphLayout.height / 2f
+                    );
+
+                    String elapsedTime = "FINAL TIME: " + this.player.getElapsedTimer().toString();
+                    glyphLayout.setText(Content.normalFont, elapsedTime);
+                    Content.normalFont.draw(
+                            spriteBatch,
+                            elapsedTime,
+                            this.view.x + this.view.width / 2 - glyphLayout.width / 2,
+                            this.view.y + 33
+                    );
+                }
             }
         spriteBatch.end();
     }

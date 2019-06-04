@@ -8,7 +8,7 @@ public class Constants {
     public static final float SPF = 1.0f / FPS;
     public static final float PHYSICS_TIMESTEP = 1.0f / 60;
     public static final int PHYSICS_MAX_SUBSTEP = 5;
-    public static final String APP_ID = "Turbo Boost";
+    public static final String APP_ID = "Turbo Blast";
 
     public static final int COUNTDOWN = 5;
 

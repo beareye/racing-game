@@ -60,4 +60,8 @@ public class Director {
         }
         fullscreen = !fullscreen;
     }
+
+    public static boolean isFullscreen() {
+        return fullscreen;
+    }
 }

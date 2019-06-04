@@ -84,6 +84,14 @@ public class Utilities {
         }
     }
 
+    public static Color getColorFromBoolean(boolean value) {
+        if (value) {
+            return Color.GREEN;
+        } else {
+            return Color.RED;
+        }
+    }
+
     /**
      * Converts a value in kilometers per hour (KMH) to miles (MPH).
      * @param value the value in kilometers per hour

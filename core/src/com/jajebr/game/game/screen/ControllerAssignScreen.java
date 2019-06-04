@@ -60,6 +60,13 @@ public class ControllerAssignScreen extends Screen {
 
             Content.jackson.stop();
         }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
+            Director.getPlayerInputController().reset();
+            Director.getPlayerInputController().stopListening();
+            Director.changeScreen(new OptionsScreen());
+            Content.jackson.stop();
+        }
     }
 
     @Override
@@ -129,6 +136,15 @@ public class ControllerAssignScreen extends Screen {
                     "PRESS ANY BUTTON TO JOIN",
                     Gdx.graphics.getWidth() / 2f - glyphLayout.width / 2f,
                     100
+            );
+
+            glyphLayout.setText(Content.normalFont, "PRESS TAB TO SET OPTIONS");
+            Content.normalFont.setColor(Color.SALMON);
+            Content.normalFont.draw(
+                    spriteBatch,
+                    "PRESS TAB TO SET OPTIONS",
+                    Gdx.graphics.getWidth() / 2f - glyphLayout.width / 2f,
+                    100 - glyphLayout.height * 2f
             );
         spriteBatch.end();
     }
